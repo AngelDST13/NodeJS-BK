@@ -1,4 +1,5 @@
 <%- include('partials/header', { bodyClass: 'home', mainClass: 'home-main' }) %>
+<div class="read-progress" aria-hidden="true"></div>
 
 <section class="band band-hero">
   <canvas class="hero-field" aria-hidden="true"></canvas>
@@ -64,6 +65,9 @@
 
   <div class="challenge-result" aria-live="polite">
     <h3>Lo que hizo el servidor</h3>
+    <% if (result && result.outcome !== 'invalid') { %>
+      <%- include('partials/seal', { sealClass: 'result-seal ' + (result.outcome === 'opened' ? 'is-open' : 'is-stop') }) %>
+    <% } %>
     <% if (!result) { %>
       <p class="hint">Aquí verás qué pasó con tu intento: cuánto tardó la verificación, cuántos intentos te quedan y si la cuenta se bloqueó.</p>
     <% } else if (result.outcome === 'opened') { %>
@@ -167,6 +171,7 @@
 </section>
 
 <section class="band band-ink">
+  <%- include('partials/guilloche') %>
   <div class="wrap closing" data-reveal>
     <%- include('partials/seal', { sealClass: 'seal-closing' }) %>
     <div>

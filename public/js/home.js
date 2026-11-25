@@ -54,6 +54,38 @@
     );
   }
 
+  // Barra de lectura en latón: cuánto de la portada llevas recorrido.
+  const progress = document.querySelector('.read-progress');
+  if (progress) {
+    let queued = false;
+    const paint = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      progress.style.transform = `scaleX(${max > 0 ? Math.min(1, window.scrollY / max) : 0})`;
+      queued = false;
+    };
+    window.addEventListener('scroll', () => {
+      if (!queued) {
+        queued = true;
+        requestAnimationFrame(paint);
+      }
+    }, { passive: true });
+    paint();
+  }
+
+  // La ficha robada se inclina siguiendo el cursor (solo con mouse, no en pantallas táctiles).
+  const card = document.querySelector('.band-hero .evidence');
+  if (card && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    card.addEventListener('pointermove', (e) => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      card.style.transform = `perspective(900px) rotateX(${(-y * 7).toFixed(2)}deg) rotateY(${(x * 9).toFixed(2)}deg)`;
+    });
+    card.addEventListener('pointerleave', () => {
+      card.style.transform = '';
+    });
+  }
+
   // 4. Los contadores suben desde cero cuando aparecen.
   const countUp = (el) => {
     const target = Number(el.dataset.count);
@@ -114,7 +146,7 @@
 
 function startField(canvas, source, still) {
   const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=$.';
-  const BG = '#2e3fd1';
+  const BG = '#0f2a26';
   const FONT_PX = 13;
   const CELL_W = 11;
   const CELL_H = 21;
@@ -151,7 +183,7 @@ function startField(canvas, source, still) {
       for (let c = 0; c < cols; c++) {
         // Cada fila arranca en otro punto del texto cifrado para que no se vean columnas repetidas.
         const i = r * 37 + c;
-        baseCtx.fillStyle = `rgba(243, 245, 255, ${0.06 + ((i * 7919) % 5) * 0.012})`;
+        baseCtx.fillStyle = `rgba(238, 245, 240, ${0.05 + ((i * 7919) % 5) * 0.012})`;
         baseCtx.fillText(charAt(i), c * CELL_W, r * CELL_H + 3);
       }
     }
@@ -186,8 +218,8 @@ function startField(canvas, source, still) {
 
     if (pointer) {
       const glow = ctx.createRadialGradient(pointer.x, pointer.y, 0, pointer.x, pointer.y, 220);
-      glow.addColorStop(0, 'rgba(160, 172, 255, 0.22)');
-      glow.addColorStop(1, 'rgba(160, 172, 255, 0)');
+      glow.addColorStop(0, 'rgba(192, 138, 46, 0.2)');
+      glow.addColorStop(1, 'rgba(192, 138, 46, 0)');
       ctx.fillStyle = glow;
       ctx.fillRect(pointer.x - 220, pointer.y - 220, 440, 440);
     }
@@ -206,7 +238,7 @@ function startField(canvas, source, still) {
       const t = (now - cell.born) / (cell.until - cell.born);
       ctx.fillStyle = BG;
       ctx.fillRect(x, y, CELL_W, CELL_H);
-      ctx.fillStyle = `rgba(214, 220, 255, ${0.75 * (1 - t) + 0.08})`;
+      ctx.fillStyle = `rgba(127, 209, 176, ${0.8 * (1 - t) + 0.08})`;
       ctx.fillText(cell.char, x, y + 3);
     }
   };
