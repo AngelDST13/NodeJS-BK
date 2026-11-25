@@ -2,12 +2,12 @@
 # Imagen de producción: dependencias reproducibles (npm ci), sin herramientas de build
 # en la imagen final y ejecución como usuario sin privilegios (bonificación).
 
-FROM node:24-alpine AS deps
+FROM node:26-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev --ignore-scripts=false && npm cache clean --force
 
-FROM node:24-alpine
+FROM node:26-alpine
 ENV NODE_ENV=production
 WORKDIR /app
 COPY --from=deps --chown=node:node /app/node_modules ./node_modules

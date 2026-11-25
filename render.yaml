@@ -33,5 +33,7 @@ services:
         sync: false
       - key: SMTP_URL
         sync: false
+      - key: MAIL_FROM
+        sync: false
       - key: ALERT_WEBHOOK_URL
         sync: false

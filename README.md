@@ -25,11 +25,11 @@ Es una aplicación web para guardar notas privadas y un dato sensible de perfil 
 
 ## Stack
 
-Node.js 24 LTS · Express 5 · PostgreSQL (`pg`, consultas parametrizadas) · EJS (escape automático) · helmet · express-rate-limit · express-session + connect-pg-simple · zod · argon2 · `node:crypto` · pino (logs JSON) · nodemailer.
+Node.js 26 (LTS activa desde el 28/10/2026) · Express 5 · PostgreSQL (`pg`, consultas parametrizadas) · EJS (escape automático) · helmet · express-rate-limit · express-session + connect-pg-simple · zod · argon2 · `node:crypto` · pino (logs JSON) · nodemailer.
 
 ## Instalación local
 
-Requisitos: Node.js 24+, Docker (para PostgreSQL).
+Requisitos: Node.js 26 LTS (funciona desde 24), Docker (para PostgreSQL).
 
 ```bash
 npm ci
@@ -53,7 +53,7 @@ Sin `SMTP_URL`, el enlace de recuperación de contraseña se imprime en la conso
 npm test
 ```
 
-43 pruebas cubren los requisitos funcionales y las evidencias OWASP (IDOR, XSS, inyección SQL, fuerza bruta → 429, CSRF, cabeceras, cifrado en BD, rotación de llaves, etc.).
+46 pruebas cubren los requisitos funcionales y las evidencias OWASP (IDOR, XSS, inyección SQL, fuerza bruta → 429, CSRF, cabeceras, modo producción (HTTPS, HSTS, configuración insegura rechazada), cifrado en BD, rotación de llaves, etc.).
 
 ## Variables de entorno
 
@@ -88,6 +88,7 @@ Arquitectura: navegador → HTTPS (certificado gestionado por Render) → proxy 
 3. **Render:** *New → Blueprint* → elegir el repositorio. Render lee `render.yaml` y pide los valores marcados `sync: false`:
    - `DATABASE_URL` (de Neon), `APP_ORIGIN` (`https://<servicio>.onrender.com`)
    - `SESSION_SECRET`, `DATA_ENCRYPTION_KEY`, `AUDIT_HMAC_KEY` → generarlos con `npm run gen-keys` **en una máquina de confianza** y pegarlos solo en Render. Guardar copia de `DATA_ENCRYPTION_KEY` en un gestor de contraseñas: si se pierde, las notas son irrecuperables.
+   - `SMTP_URL` (necesario para que la recuperación de contraseña funcione en producción). Ejemplo con Gmail y una *contraseña de aplicación*: `smtps://tu_correo%40gmail.com:<contraseña_de_aplicacion>@smtp.gmail.com:465`, y `MAIL_FROM` con ese mismo correo.
 4. Render construye el `Dockerfile`, la app aplica migraciones al arrancar y el health check usa `/health`. HTTPS es automático y la app redirige HTTP→HTTPS (308) y envía HSTS.
 5. `autoDeployTrigger: checksPass`: cada push a `main` se despliega **solo si** GitHub Actions (gitleaks, `npm audit`, pruebas, build Docker) pasó.
 6. Crear el administrador: registrarse en la URL pública y ejecutar `npm run create-admin -- correo` desde la *Shell* del servicio en Render (o local con `DATABASE_URL` de producción).

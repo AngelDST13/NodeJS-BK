@@ -100,7 +100,7 @@ Buenas prácticas: TLS con verificación del certificado (`sslmode=verify-full` 
 Usuario ──HTTPS──▶ Render (TLS + balanceador, X-Forwarded-*)
                       │
                       ▼
-              Contenedor Docker (node:24-alpine, usuario "node")
+              Contenedor Docker (node:26-alpine, usuario "node")
               trust proxy=1 · helmet · rate limit · sesiones en PostgreSQL
                       │ TLS verificado
                       ▼
