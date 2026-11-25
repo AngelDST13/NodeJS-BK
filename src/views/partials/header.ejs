@@ -1,5 +1,5 @@
 <%- include('head') %>
-<body class="app">
+<body class="app <%= typeof bodyClass !== 'undefined' ? bodyClass : '' %>">
   <a class="skip" href="#contenido">Saltar al contenido</a>
   <header class="topbar">
     <a href="/" class="brand">
@@ -26,4 +26,4 @@
       </nav>
     <% } %>
   </header>
-  <main id="contenido" class="page">
+  <main id="contenido" class="<%= typeof mainClass !== 'undefined' ? mainClass : 'page' %>">

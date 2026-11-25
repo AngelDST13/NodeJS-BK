@@ -1,34 +1,38 @@
-<%- include('partials/header') %>
+<%- include('partials/header', { bodyClass: 'home', mainClass: 'home-main' }) %>
 
-<section class="hero">
-  <div class="hero-copy">
-    <h1>Te mostramos lo que robaría un atacante.</h1>
-    <p class="hero-lede">Esta es una cuenta real de Sigilo, tal como está guardada en nuestra base de datos: la contraseña convertida en una huella Argon2id y la nota cifrada con AES-256-GCM. Ábrela si puedes.</p>
-    <div class="hero-actions">
-      <a href="#reto" class="btn btn-primary">Intentar abrir el sello</a>
-      <a href="/register" class="btn btn-secondary">Crear mi libreta</a>
+<section class="band band-hero">
+  <div class="wrap hero">
+    <div class="hero-copy">
+      <h1>Te mostramos lo que robaría un atacante.</h1>
+      <p class="hero-lede">Esta es una cuenta real de Sigilo, tal como está guardada en nuestra base de datos: la contraseña convertida en una huella Argon2id y la nota cifrada con AES-256-GCM. Ábrela si puedes.</p>
+      <div class="hero-actions">
+        <a href="#reto" class="btn btn-light">Intentar abrir el sello</a>
+        <a href="/register" class="btn btn-outline-light">Crear mi libreta</a>
+      </div>
     </div>
-  </div>
 
-  <figure class="evidence" aria-labelledby="evidence-caption">
-    <%- include('partials/seal', { sealClass: 'seal-evidence' }) %>
-    <dl>
-      <div><dt>Cuenta</dt><dd><code><%= evidence.email %></code></dd></div>
-      <div><dt>Contraseña guardada</dt><dd><code><%= evidence.passwordHash %></code></dd></div>
-      <div><dt>Nota guardada</dt><dd><code><%= evidence.noteCipher %></code></dd></div>
-    </dl>
-    <figcaption id="evidence-caption">Datos en vivo, leídos de la base de datos al cargar esta página.</figcaption>
-  </figure>
+    <figure class="evidence" aria-labelledby="evidence-caption">
+      <%- include('partials/seal', { sealClass: 'seal-evidence' }) %>
+      <dl>
+        <div><dt>Cuenta</dt><dd><code><%= evidence.email %></code></dd></div>
+        <div><dt>Contraseña guardada</dt><dd><code data-scramble><%= evidence.passwordHash %></code></dd></div>
+        <div><dt>Nota guardada</dt><dd><code data-scramble><%= evidence.noteCipher %></code></dd></div>
+      </dl>
+      <figcaption id="evidence-caption">Datos en vivo, leídos de la base de datos al cargar esta página.</figcaption>
+    </figure>
+  </div>
 </section>
 
-<p class="tally">
-  Hasta ahora: <strong><%= evidence.stats.attempts %></strong> intentos fallidos,
-  <strong><%= evidence.stats.throttled %></strong> frenados por el límite de velocidad,
-  <strong><%= evidence.stats.locks %></strong> bloqueos de la cuenta y
-  <strong><%= evidence.stats.opened %></strong> aperturas.
-</p>
+<div class="wrap">
+  <p class="tally" data-reveal>
+    Hasta ahora: <strong data-count="<%= evidence.stats.attempts %>"><%= evidence.stats.attempts %></strong> intentos fallidos,
+    <strong data-count="<%= evidence.stats.throttled %>"><%= evidence.stats.throttled %></strong> frenados por el límite de velocidad,
+    <strong data-count="<%= evidence.stats.locks %>"><%= evidence.stats.locks %></strong> bloqueos de la cuenta y
+    <strong><%= evidence.stats.opened %></strong> aperturas.
+  </p>
+</div>
 
-<section id="reto" class="challenge" aria-labelledby="reto-title">
+<section id="reto" class="wrap challenge" aria-labelledby="reto-title" data-reveal>
   <div class="challenge-form">
     <h2 id="reto-title">Pon a prueba el sello</h2>
     <p>Prueba contraseñas contra la cuenta <code><%= evidence.email %></code>. Pasan por el mismo inicio de sesión que usan las cuentas reales.</p>
@@ -88,7 +92,7 @@
   </div>
 </section>
 
-<section class="meter" aria-labelledby="meter-title">
+<section class="wrap meter" aria-labelledby="meter-title" data-reveal>
   <h2 id="meter-title">¿Cuánto tardarían en adivinar tu contraseña?</h2>
   <p>Escribe una contraseña y mira cuántas combinaciones tendría que probar alguien y cuánto le tomaría según cómo esté guardada. El cálculo ocurre en tu navegador: no se envía a ningún lado.</p>
   <div class="field meter-field">
@@ -120,53 +124,61 @@
   </div>
 </section>
 
-<section class="promises" aria-labelledby="promises-title">
-  <h2 id="promises-title">Qué hace Sigilo con tus datos</h2>
+<section class="wrap promises" aria-labelledby="promises-title">
+  <header class="promises-head">
+    <h2 id="promises-title">Qué hace Sigilo con tus datos</h2>
+    <p>Ocho decisiones que protegen tu información incluso si alguien roba la base de datos o intenta adivinar tu contraseña.</p>
+  </header>
   <dl>
-    <div>
+    <div data-reveal>
       <dt>Tu contraseña</dt>
       <dd>Nunca la guardamos. Guardamos una huella Argon2id con sal propia; para comprobarla hay que gastar 19 MiB de memoria por intento, y eso vuelve inútiles las tarjetas gráficas de los atacantes.</dd>
     </div>
-    <div>
+    <div data-reveal>
       <dt>Tus notas</dt>
       <dd>Se cifran con AES-256-GCM antes de tocar la base de datos, con un vector nuevo en cada guardado. Si alguien altera un solo byte, la nota se niega a abrirse.</dd>
     </div>
-    <div>
+    <div data-reveal>
       <dt>Tu teléfono</dt>
       <dd>Cifrado igual que las notas y mostrado solo como ***-***-1234.</dd>
     </div>
-    <div>
+    <div data-reveal>
       <dt>Tu sesión</dt>
       <dd>Una cookie que el JavaScript de la página no puede leer, que solo viaja por HTTPS y a nuestro propio sitio. Cambia al entrar y caduca a los 30 minutos sin uso.</dd>
     </div>
-    <div>
+    <div data-reveal>
       <dt>Otras personas</dt>
       <dd>No pueden abrir tus notas aunque adivinen su dirección: el servidor comprueba en cada consulta que la nota sea tuya.</dd>
     </div>
-    <div>
+    <div data-reveal>
       <dt>Quien intente adivinar</dt>
       <dd>Pocos intentos por conexión y bloqueos cada vez más largos por cuenta. Al quinto fallo seguido se envía una alerta.</dd>
     </div>
-    <div>
+    <div data-reveal>
       <dt>El registro</dt>
       <dd>Cada inicio de sesión, acceso denegado y cambio de permisos queda en una bitácora firmada. Si alguien la edita, se nota.</dd>
     </div>
-    <div>
+    <div data-reveal>
       <dt>Recuperar el acceso</dt>
       <dd>Enlaces de un solo uso que vencen en 30 minutos. En nuestra base solo queda su huella, así que una copia robada no sirve para nada.</dd>
     </div>
-  </dl>
+    </dl>
 </section>
 
-<section class="closing">
-  <%- include('partials/seal', { sealClass: 'seal-md' }) %>
-  <h2>Tu libreta, sellada.</h2>
-  <p>Crea una cuenta y escribe tu primera nota. Solo tú tienes la llave.</p>
-  <div class="hero-actions">
-    <a href="/register" class="btn btn-primary">Crear mi libreta</a>
-    <a href="/login" class="btn btn-quiet">Ya tengo cuenta</a>
+<section class="band band-ink">
+  <div class="wrap closing" data-reveal>
+    <%- include('partials/seal', { sealClass: 'seal-closing' }) %>
+    <div>
+      <h2>Tu libreta, sellada.</h2>
+      <p>Crea una cuenta y escribe tu primera nota. Solo tú tienes la llave.</p>
+      <div class="hero-actions">
+        <a href="/register" class="btn btn-light">Crear mi libreta</a>
+        <a href="/login" class="btn btn-outline-light">Ya tengo cuenta</a>
+      </div>
+    </div>
   </div>
 </section>
 
 <script src="/static/js/meter.js?v=<%= assetVersion %>" defer></script>
+<script src="/static/js/home.js?v=<%= assetVersion %>" defer></script>
 <%- include('partials/footer') %>
