@@ -3,6 +3,8 @@ import helmet from 'helmet';
 import session from 'express-session';
 import connectPgSimple from 'connect-pg-simple';
 import path from 'node:path';
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { config } from './config.js';
 import { pool } from './db/pool.js';
@@ -30,6 +32,13 @@ export const CDN_STYLESHEETS = Object.freeze([
     integrity: 'sha384-+QBjh8Rf2AeMZ97jKneMOAzYlmUZVgvG+wIQm9+YdOYQGlz5eP08S9+QYKyIYhDc',
   },
 ]);
+
+// Versión de la hoja de estilos según su contenido: cada cambio genera una URL nueva,
+// así el navegador nunca mezcla HTML nuevo con un CSS viejo guardado en caché.
+const stylesheetPath = path.join(rootDir, '..', 'public', 'css', 'app.css');
+const hashFile = (file) => createHash('sha256').update(readFileSync(file)).digest('hex').slice(0, 12);
+const productionAssetVersion = config.isProduction ? hashFile(stylesheetPath) : null;
+const assetVersion = () => productionAssetVersion ?? hashFile(stylesheetPath);
 
 const dateFormatters = new Map();
 const formatDate = (date, options = { dateStyle: 'medium', timeStyle: 'short' }) => {
@@ -88,11 +97,18 @@ export const createApp = () => {
     next();
   });
 
-  app.use('/static', express.static(path.join(rootDir, '..', 'public'), { maxAge: '7d', index: false }));
+  app.use('/static', express.static(path.join(rootDir, '..', 'public'), {
+      index: false,
+      // Con ?v=<hash> la URL cambia en cada versión: se puede cachear un año sin riesgo.
+      setHeaders: (res, _file) => {
+        res.set('Cache-Control', res.req.query.v ? 'public, max-age=31536000, immutable' : 'no-cache');
+      },
+    }));
   app.use((req, res, next) => {
     res.set('Cache-Control', 'no-store'); // páginas con datos privados no se guardan en caché
     res.locals.cdnStylesheets = CDN_STYLESHEETS;
     res.locals.formatDate = formatDate;
+    res.locals.assetVersion = assetVersion();
     res.locals.title = 'Sigilo';
     res.locals.currentUser = null;
     next();

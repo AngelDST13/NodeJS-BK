@@ -8,6 +8,6 @@
   <% cdnStylesheets.forEach((s) => { %>
   <link rel="stylesheet" href="<%= s.href %>" integrity="<%= s.integrity %>" crossorigin="anonymous">
   <% }) %>
-  <link rel="stylesheet" href="/static/css/app.css">
+  <link rel="stylesheet" href="/static/css/app.css?v=<%= assetVersion %>">
   <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
 </head>
