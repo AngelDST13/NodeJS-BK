@@ -379,18 +379,42 @@ td.cell-action form { display: inline-block; }
 .meter > p { color: var(--muted); max-width: 60ch; margin-top: 0.75rem; }
 .meter-field { max-width: 30rem; margin-top: 1.75rem; }
 .meter-input-row { display: flex; gap: 0.5rem; align-items: center; }
-.meter-rows { list-style: none; margin: 2rem 0 1rem; padding: 0; border-top: 1.5px solid var(--ink); }
-.meter-rows li {
-  display: grid; grid-template-columns: minmax(12rem, 1.3fr) minmax(8rem, 2fr) minmax(9rem, 1fr);
-  gap: 1.25rem; align-items: center; padding: 1rem 0; border-bottom: 1px solid var(--line);
-}
-.meter-label { font-weight: 500; }
-.meter-bar { height: 0.6rem; border-radius: 999px; background: var(--line); overflow: hidden; }
-.meter-bar > span { display: block; height: 100%; width: 0; border-radius: inherit; background: var(--muted); transition: width 300ms ease, background-color 300ms ease; }
-.meter-rows li[data-level='weak'] .meter-bar > span { background: var(--danger); }
-.meter-rows li[data-level='fair'] .meter-bar > span { background: var(--warn); }
-.meter-rows li[data-level='strong'] .meter-bar > span { background: var(--ok); }
-.meter-time { text-align: right; font-weight: 600; }
+.meter-output { margin-top: 2rem; }
+.meter-facts { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 clamp(1.5rem, 4vw, 3rem); border-top: 1.5px solid var(--ink); }
+.meter-facts > div { padding: 1rem 0; border-bottom: 1px solid var(--line); }
+.meter-facts > div.wide { grid-column: 1 / -1; }
+.meter-facts dt { font-size: var(--step--1); color: var(--muted); margin-bottom: 0.25rem; }
+.meter-facts dd { margin: 0; font-size: var(--step-1); overflow-wrap: anywhere; }
+.meter-facts dd.sub { font-size: var(--step--1); color: var(--muted); margin-top: 0.25rem; }
+.meter-facts .formula { color: var(--muted); }
+.meter-facts strong { font-family: var(--font-display); font-weight: 400; font-size: var(--step-3); line-height: 1.1; color: var(--cobalt); }
+.policy { list-style: none; margin: 0.2rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.35rem 1rem; font-size: 0.9375rem; }
+.policy .ok { color: var(--ok); }
+.policy .missing { color: var(--danger); }
+.meter-note { margin: 1.25rem 0 1.5rem; padding: 0.8rem 1rem; border-radius: var(--radius-field); background: var(--surface); border: 1px solid var(--line); max-width: 75ch; }
+.meter-output[data-kind='common'] .meter-note,
+.meter-output[data-kind='word'] .meter-note,
+.meter-output[data-kind='repeat'] .meter-note { background: var(--warn-wash); border-color: transparent; color: var(--warn); }
+.scenarios td { vertical-align: top; }
+.scenarios td small { display: block; color: var(--muted); font-size: var(--step--1); margin-top: 0.15rem; }
+.scenarios td:nth-child(3) { font-weight: 600; }
+.scenarios tr[data-level='weak'] td:nth-child(3) { color: var(--danger); }
+.scenarios tr[data-level='fair'] td:nth-child(3) { color: var(--warn); }
+.scenarios tr[data-level='strong'] td:nth-child(3) { color: var(--ok); }
+.scenarios .bar-cell { width: 22%; min-width: 8rem; vertical-align: middle; }
+.meter-bar { display: block; height: 0.55rem; border-radius: 999px; background: var(--line); overflow: hidden; }
+.meter-bar > span { display: block; height: 100%; width: 0; border-radius: inherit; background: var(--muted); transition: width 300ms ease; }
+.scenarios tr[data-level='weak'] .meter-bar > span { background: var(--danger); }
+.scenarios tr[data-level='fair'] .meter-bar > span { background: var(--warn); }
+.scenarios tr[data-level='strong'] .meter-bar > span { background: var(--ok); }
+
+.odds { margin: 1.5rem 0 1.75rem; padding: 1.1rem 1.25rem; border-radius: 16px; background: var(--cobalt-wash); }
+.odds h3 { margin: 0 0 0.6rem; font-size: var(--step-0); font-weight: 600; }
+.odds dl { margin: 0; display: grid; gap: 0.6rem; }
+.odds dt { font-size: var(--step--1); color: var(--muted); }
+.odds dd { margin: 0; font-weight: 600; }
+.odds sup { font-size: 0.7em; }
+.odds .hint { margin-top: 0.75rem; }
 
 .promises dl { margin: 2rem 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 clamp(2rem, 5vw, 4rem); }
 .promises dl > div { padding: 1.4rem 0; border-top: 1.5px solid var(--ink); }
@@ -404,7 +428,12 @@ td.cell-action form { display: inline-block; }
 @media (max-width: 860px) {
   .hero, .challenge { grid-template-columns: 1fr; }
   .promises dl { grid-template-columns: 1fr; }
-  .meter-rows li { grid-template-columns: 1fr auto; gap: 0.5rem 1rem; }
-  .meter-label { grid-column: 1 / -1; }
-  .meter-time { text-align: right; }
+  .meter-facts { grid-template-columns: 1fr; }
+  .meter-facts strong { font-size: var(--step-2); }
+  .scenarios thead { display: none; }
+  .scenarios, .scenarios tbody { display: block; }
+  .scenarios tr { display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem 1rem; padding: 0.9rem 0; border-bottom: 1px solid var(--line); }
+  .scenarios td { display: block; padding: 0; border: 0; }
+  .scenarios td:first-child, .scenarios .bar-cell { grid-column: 1 / -1; width: auto; }
+  .scenarios td[data-label]::before { content: attr(data-label); display: block; font-size: var(--step--1); color: var(--muted); font-weight: 400; }
 }

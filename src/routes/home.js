@@ -14,6 +14,23 @@ const attemptSchema = z.object({
   password: z.string().min(1, 'Escribe una contraseña para intentarlo.').max(128, 'Máximo 128 caracteres.'),
 });
 
+// Cuánto tomaría abrir el sello por fuerza bruta. La contraseña del reto son 24 bytes
+// aleatorios en base64url: 32 caracteres de un alfabeto de 64 → 64^32 combinaciones.
+const SUP = '⁰¹²³⁴⁵⁶⁷⁸⁹';
+const sci = (digits) => `${digits[0]},${digits.slice(1, 3)} × 10${String(digits.length - 1).replace(/\d/g, (d) => SUP[d])}`;
+const UNIVERSE_S = 1.38e10 * 365.25 * 86400;
+const timesUniverse = (seconds) => sci(BigInt(Math.round(seconds / UNIVERSE_S)).toString());
+const RETO_COMBOS = 64n ** 32n;
+const RETO_AVERAGE = Number(RETO_COMBOS / 2n);
+export const CHALLENGE_FACTS = Object.freeze({
+  alphabet: 64,
+  length: 32,
+  combos: sci(RETO_COMBOS.toString()),
+  online: timesUniverse(RETO_AVERAGE * 3600), // 1 intento por hora contra Sigilo
+  offline: timesUniverse(RETO_AVERAGE / 1e3), // base robada, Argon2id en una tarjeta gráfica
+  md5: timesUniverse(RETO_AVERAGE / 1.6e11), // incluso si estuviera en MD5
+});
+
 const renderHome = async (req, res, status = 200) => {
   const evidence = await getEvidence();
   const result = req.session.challengeResult ?? null;
@@ -23,6 +40,7 @@ const renderHome = async (req, res, status = 200) => {
     evidence,
     result: res.locals.challengeResult ?? result,
     challengeLimit: CHALLENGE_LIMIT,
+    facts: CHALLENGE_FACTS,
   });
 };
 

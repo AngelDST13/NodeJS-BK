@@ -37,6 +37,16 @@
       <li>Tras 5 fallos seguidos, la cuenta se bloquea 1, 2, 4… hasta 60 minutos, para todos.</li>
       <li>La contraseña es aleatoria, de 32 caracteres, y nadie la conoce: ni siquiera el equipo.</li>
     </ul>
+    <div class="odds">
+      <h3>¿Cuánto tomaría abrirla?</h3>
+      <dl>
+        <div><dt>Combinaciones posibles</dt><dd><%= facts.alphabet %><sup><%= facts.length %></sup> = <%= facts.combos %></dd></div>
+        <div><dt>Probando aquí, al ritmo que permite Sigilo</dt><dd><%= facts.online %> veces la edad del universo</dd></div>
+        <div><dt>Robando la base y atacando el hash Argon2id</dt><dd><%= facts.offline %> veces la edad del universo</dd></div>
+        <div><dt>Incluso si estuviera guardada con MD5</dt><dd><%= facts.md5 %> veces la edad del universo</dd></div>
+      </dl>
+      <p class="hint">Tiempos promedio: se acierta, de media, tras probar la mitad de las combinaciones.</p>
+    </div>
     <form method="post" action="/reto" class="stack" novalidate>
       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <div class="field">
@@ -79,8 +89,8 @@
 </section>
 
 <section class="meter" aria-labelledby="meter-title">
-  <h2 id="meter-title">¿Cuánto resiste tu contraseña?</h2>
-  <p>Escribe una contraseña y compara cuánto tardaría alguien en adivinarla según cómo se guarde. El cálculo ocurre en tu navegador: no se envía a ningún lado.</p>
+  <h2 id="meter-title">¿Cuánto tardarían en adivinar tu contraseña?</h2>
+  <p>Escribe una contraseña y mira cuántas combinaciones tendría que probar alguien y cuánto le tomaría según cómo esté guardada. El cálculo ocurre en tu navegador: no se envía a ningún lado.</p>
   <div class="field meter-field">
     <label for="meter-input">Contraseña</label>
     <div class="meter-input-row">
@@ -89,24 +99,25 @@
     </div>
   </div>
   <noscript><p class="hint">Activa JavaScript para usar la calculadora.</p></noscript>
-  <ol class="meter-rows" id="meter-rows">
-    <li data-scenario="md5">
-      <span class="meter-label">Guardada con MD5, como en sistemas mal diseñados</span>
-      <span class="meter-bar"><span></span></span>
-      <span class="meter-time">—</span>
-    </li>
-    <li data-scenario="argon">
-      <span class="meter-label">Guardada con Argon2id, como en Sigilo</span>
-      <span class="meter-bar"><span></span></span>
-      <span class="meter-time">—</span>
-    </li>
-    <li data-scenario="online">
-      <span class="meter-label">Probándola en línea contra Sigilo</span>
-      <span class="meter-bar"><span></span></span>
-      <span class="meter-time">—</span>
-    </li>
-  </ol>
-  <p class="hint" id="meter-note">Estimación para una contraseña elegida al azar. Si es una palabra común o un patrón conocido, cae mucho antes.</p>
+
+  <div id="meter-output" class="meter-output" hidden aria-live="polite">
+    <dl class="meter-facts">
+      <div><dt>Longitud</dt><dd id="m-length"></dd></div>
+      <div><dt>Caracteres posibles</dt><dd id="m-alphabet"></dd><dd class="sub" id="m-alphabet-detail"></dd></div>
+      <div class="wide"><dt>Combinaciones posibles</dt><dd><span class="formula" id="m-formula"></span> <strong id="m-combos"></strong></dd><dd class="sub" id="m-bits"></dd></div>
+      <div><dt>Intentos promedio para acertar</dt><dd id="m-average"></dd></div>
+      <div><dt>Política de Sigilo</dt><dd><ul class="policy" id="m-policy"></ul></dd><dd class="sub" id="m-policy-verdict"></dd></div>
+    </dl>
+    <p class="meter-note" id="m-note"></p>
+
+    <div class="table-wrap">
+      <table class="scenarios">
+        <thead><tr><th>Escenario</th><th>Velocidad del atacante</th><th>Tiempo promedio</th><th>Peor caso</th><th><span class="visually-hidden">Escala</span></th></tr></thead>
+        <tbody id="m-scenarios"></tbody>
+      </table>
+    </div>
+    <p class="hint">Velocidades aproximadas con una tarjeta gráfica de gama alta para los casos de base robada. «En línea contra Sigilo» supone el bloqueo progresivo de la cuenta: en la práctica, un intento por hora.</p>
+  </div>
 </section>
 
 <section class="promises" aria-labelledby="promises-title">
