@@ -1,0 +1,23 @@
+<%- include('partials/header') %>
+<article class="narrow">
+  <h1>Crear cuenta</h1>
+  <%- include('partials/messages') %>
+  <form method="post" action="/register" novalidate>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <label>Nombre
+      <input type="text" name="name" value="<%= values.name || '' %>" autocomplete="name" required maxlength="80">
+    </label>
+    <label>Correo
+      <input type="email" name="email" value="<%= values.email || '' %>" autocomplete="email" required maxlength="254">
+    </label>
+    <label>Contraseña
+      <input type="password" name="password" autocomplete="new-password" required minlength="12" maxlength="128" aria-describedby="pw-help">
+      <small id="pw-help">Mínimo 12 caracteres, con mayúscula, minúscula, número y símbolo.</small>
+    </label>
+    <label>Confirmar contraseña
+      <input type="password" name="confirmPassword" autocomplete="new-password" required maxlength="128">
+    </label>
+    <button type="submit">Crear cuenta</button>
+  </form>
+</article>
+<%- include('partials/footer') %>

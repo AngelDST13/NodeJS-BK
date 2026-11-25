@@ -1,0 +1,8 @@
+<% if (typeof flash !== 'undefined' && flash) { %>
+  <p class="notice" role="status"><%= flash %></p>
+<% } %>
+<% if (typeof errors !== 'undefined' && errors.length) { %>
+  <div class="errors" role="alert">
+    <ul><% errors.forEach((e) => { %><li><%= e %></li><% }) %></ul>
+  </div>
+<% } %>

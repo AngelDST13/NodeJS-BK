@@ -1,0 +1,15 @@
+.narrow { max-width: 32rem; margin-inline: auto; }
+.inline { display: inline; margin: 0; }
+.inline button { margin: 0; }
+.small { padding: 0.25rem 0.75rem; font-size: 0.875rem; width: auto; }
+.brand { text-decoration: none; }
+.notice { padding: 0.75rem 1rem; border-left: 4px solid var(--pico-primary); background: var(--pico-card-sectioning-background-color); }
+.errors { padding: 0.75rem 1rem; border-left: 4px solid var(--pico-del-color); background: var(--pico-card-sectioning-background-color); margin-bottom: 1rem; }
+.errors ul { margin: 0; }
+.note-list { list-style: none; padding: 0; }
+.note-list li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.5rem 0; border-bottom: 1px solid var(--pico-muted-border-color); }
+.note-body { white-space: pre-wrap; overflow-wrap: anywhere; }
+.actions { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
+.actions > * { margin: 0; }
+.table-wrap { overflow-x: auto; }
+tr.tampered td { color: var(--pico-del-color); font-weight: 600; }

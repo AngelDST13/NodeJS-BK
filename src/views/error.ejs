@@ -1,0 +1,8 @@
+<%- include('partials/header') %>
+<article class="narrow">
+  <h1><%= title %></h1>
+  <p><%= message %></p>
+  <% if (typeof errorId !== 'undefined' && errorId) { %><p><small>Código de referencia: <code><%= errorId %></code></small></p><% } %>
+  <p><a href="/">Volver al inicio</a></p>
+</article>
+<%- include('partials/footer') %>

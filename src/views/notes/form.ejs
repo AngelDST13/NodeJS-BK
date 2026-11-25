@@ -1,0 +1,18 @@
+<%- include('../partials/header') %>
+<article>
+  <h1><%= title %></h1>
+  <%- include('../partials/messages') %>
+  <form method="post" action="<%= note.id ? `/notes/${note.id}` : '/notes' %>" novalidate>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <label>Título
+      <input type="text" name="title" value="<%= note.title || '' %>" required maxlength="<%= limits.maxNoteTitle %>">
+    </label>
+    <label>Contenido
+      <textarea name="body" rows="10" maxlength="<%= limits.maxNoteBody %>"><%= note.body || '' %></textarea>
+      <small>Máximo <%= limits.maxNoteBody %> caracteres.</small>
+    </label>
+    <button type="submit">Guardar</button>
+    <a href="<%= note.id ? `/notes/${note.id}` : '/notes' %>">Cancelar</a>
+  </form>
+</article>
+<%- include('../partials/footer') %>

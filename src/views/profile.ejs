@@ -1,0 +1,23 @@
+<%- include('partials/header') %>
+<article class="narrow">
+  <h1>Mi perfil</h1>
+  <%- include('partials/messages') %>
+  <dl>
+    <dt>Correo</dt><dd><%= profile.email %></dd>
+    <dt>Rol</dt><dd><%= profile.role === 'admin' ? 'Administrador' : 'Usuario' %></dd>
+    <dt>Teléfono</dt><dd><%= profile.maskedPhone || 'Sin registrar' %></dd>
+  </dl>
+  <form method="post" action="/profile" novalidate>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <label>Nombre
+      <input type="text" name="name" value="<%= profile.name %>" required maxlength="80">
+    </label>
+    <label>Teléfono (se guarda cifrado)
+      <input type="tel" name="phone" value="" maxlength="20" autocomplete="off"
+             placeholder="<%= profile.maskedPhone || '+57 300 123 4567' %>">
+      <small>Escribe un número para reemplazarlo; déjalo vacío para borrarlo.</small>
+    </label>
+    <button type="submit">Guardar</button>
+  </form>
+</article>
+<%- include('partials/footer') %>

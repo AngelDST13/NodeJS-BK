@@ -1,0 +1,67 @@
+# Pipeline CI (A03 / A08): nada llega a producción sin pasar secretos, auditoría y pruebas.
+# Render está configurado con autoDeployTrigger: checksPass (render.yaml), así que solo
+# despliega un commit de main cuando TODOS estos checks están en verde.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  secrets-scan:
+    name: Escaneo de secretos (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # todo el historial: un .env subido y luego borrado también se detecta
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  test:
+    name: Auditoría y pruebas
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: securevault
+          POSTGRES_PASSWORD: securevault
+          POSTGRES_DB: securevault_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U securevault"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      NODE_ENV: test
+      APP_ORIGIN: http://localhost:3000
+      TRUST_PROXY: '1'
+      DATABASE_URL: postgres://securevault:securevault@localhost:5432/securevault_test
+      DATABASE_SSL: 'false'
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      - name: Instalar dependencias exactas del lockfile
+        run: npm ci
+      - name: Auditar dependencias (falla con altas o críticas)
+        run: npm audit --audit-level=high
+      - name: Generar llaves efímeras solo para las pruebas
+        run: node scripts/gen-keys.js >> "$GITHUB_ENV"
+      - name: Pruebas
+        run: npm test
+
+  docker:
+    name: Build de la imagen
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v5
+      - run: docker build -t securevault:ci .

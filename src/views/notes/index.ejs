@@ -1,0 +1,20 @@
+<%- include('../partials/header') %>
+<hgroup>
+  <h1>Mis notas</h1>
+  <p><%= notes.length %> de <%= limits.maxNotesPerUser %> notas · cifradas en la base de datos</p>
+</hgroup>
+<%- include('../partials/messages') %>
+<p><a href="/notes/new" role="button">Nueva nota</a></p>
+<% if (notes.length === 0) { %>
+  <p>Aún no tienes notas.</p>
+<% } else { %>
+  <ul class="note-list">
+    <% notes.forEach((n) => { %>
+      <li>
+        <a href="/notes/<%= n.id %>"><%= n.title %></a>
+        <small>actualizada <%= n.updatedAt.toLocaleString('es') %></small>
+      </li>
+    <% }) %>
+  </ul>
+<% } %>
+<%- include('../partials/footer') %>

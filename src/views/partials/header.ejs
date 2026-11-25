@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %> · SecureVault</title>
+  <link rel="stylesheet" href="<%= cdnStylesheet.href %>" integrity="<%= cdnStylesheet.integrity %>" crossorigin="anonymous">
+  <link rel="stylesheet" href="/static/css/app.css">
+  <link rel="icon" href="data:,">
+</head>
+<body>
+  <header class="container">
+    <nav>
+      <ul><li><a href="/" class="brand"><strong>SecureVault</strong></a></li></ul>
+      <ul>
+        <% if (currentUser) { %>
+          <li><a href="/notes">Notas</a></li>
+          <li><a href="/profile">Perfil</a></li>
+          <% if (currentUser.role === 'admin') { %><li><a href="/admin">Admin</a></li><% } %>
+          <li>
+            <form method="post" action="/logout" class="inline">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="submit" class="secondary outline small">Salir</button>
+            </form>
+          </li>
+        <% } else { %>
+          <li><a href="/login">Entrar</a></li>
+          <li><a href="/register">Crear cuenta</a></li>
+        <% } %>
+      </ul>
+    </nav>
+  </header>
+  <main class="container">

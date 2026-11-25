@@ -1,0 +1,17 @@
+<%- include('partials/header') %>
+<article class="narrow">
+  <h1>Iniciar sesión</h1>
+  <%- include('partials/messages') %>
+  <form method="post" action="/login" novalidate>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <label>Correo
+      <input type="email" name="email" value="<%= values.email || '' %>" autocomplete="username" required maxlength="254">
+    </label>
+    <label>Contraseña
+      <input type="password" name="password" autocomplete="current-password" required maxlength="128">
+    </label>
+    <button type="submit">Entrar</button>
+  </form>
+  <p><a href="/forgot-password">¿Olvidaste tu contraseña?</a> · <a href="/register">Crear cuenta</a></p>
+</article>
+<%- include('partials/footer') %>

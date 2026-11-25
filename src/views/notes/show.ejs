@@ -1,0 +1,15 @@
+<%- include('../partials/header') %>
+<article>
+  <header><h1><%= note.title %></h1></header>
+  <%# La etiqueta de salida con signo igual escapa HTML: un script guardado se muestra como texto (A05) %>
+  <div class="note-body"><%= note.body %></div>
+  <footer class="actions">
+    <a href="/notes/<%= note.id %>/edit" role="button" class="secondary">Editar</a>
+    <form method="post" action="/notes/<%= note.id %>/delete" class="inline">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <button type="submit" class="contrast">Eliminar</button>
+    </form>
+    <a href="/notes">Volver</a>
+  </footer>
+</article>
+<%- include('../partials/footer') %>

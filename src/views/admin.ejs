@@ -1,0 +1,56 @@
+<%- include('partials/header') %>
+<h1>Administración</h1>
+<%- include('partials/messages') %>
+
+<section>
+  <h2>Usuarios</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Correo</th><th>Nombre</th><th>Rol</th><th>Estado</th><th>Alta</th><th>Cambiar rol</th></tr></thead>
+      <tbody>
+        <% users.forEach((u) => { %>
+          <tr>
+            <td><%= u.email %></td>
+            <td><%= u.name %></td>
+            <td><%= u.role %></td>
+            <td><%= u.locked ? 'Bloqueado' : (u.failed_login_count > 0 ? `${u.failed_login_count} fallos` : 'Activo') %></td>
+            <td><%= u.created_at.toLocaleDateString('es') %></td>
+            <td>
+              <% if (u.id !== currentUser.id) { %>
+                <form method="post" action="/admin/users/<%= u.id %>/role" class="inline">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <input type="hidden" name="role" value="<%= u.role === 'admin' ? 'user' : 'admin' %>">
+                  <button type="submit" class="secondary outline small"><%= u.role === 'admin' ? 'Quitar admin' : 'Hacer admin' %></button>
+                </form>
+              <% } else { %>—<% } %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>Bitácora de seguridad</h2>
+  <p><small>Últimos 100 eventos. La columna «Integridad» verifica el HMAC-SHA256 de cada registro.</small></p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Fecha</th><th>Evento</th><th>Actor</th><th>Objetivo</th><th>IP</th><th>Detalle</th><th>Integridad</th></tr></thead>
+      <tbody>
+        <% events.forEach((e) => { %>
+          <tr class="<%= e.intact ? '' : 'tampered' %>">
+            <td><%= e.occurred_at.toLocaleString('es') %></td>
+            <td><code><%= e.event_type %></code></td>
+            <td><%= e.actor_email || '—' %></td>
+            <td><small><%= e.target_id || '—' %></small></td>
+            <td><%= e.ip || '—' %></td>
+            <td><small><%= JSON.stringify(e.details) %></small></td>
+            <td><%= e.intact ? 'OK' : 'ALTERADO' %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</section>
+<%- include('partials/footer') %>
