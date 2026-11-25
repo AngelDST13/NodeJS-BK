@@ -1,6 +1,8 @@
-# SecureVault
+# Sigilo
 
-Aplicación web para guardar notas privadas y un dato sensible de perfil (teléfono), construida con Node.js aplicando el **OWASP Top 10:2025**, hash de contraseñas con **Argon2id**, cifrado autenticado **AES-256-GCM** y despliegue en producción con HTTPS.
+**Sigilo** es nuestra implementación de *SecureVault*, el sistema del laboratorio.
+
+Es una aplicación web para guardar notas privadas y un dato sensible de perfil (teléfono), construida con Node.js aplicando el **OWASP Top 10:2025**, hash de contraseñas con **Argon2id**, cifrado autenticado **AES-256-GCM** y despliegue en producción con HTTPS.
 
 | Documento | Contenido |
 |---|---|

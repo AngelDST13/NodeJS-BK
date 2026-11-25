@@ -1,33 +1,29 @@
-<!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title><%= title %> · SecureVault</title>
-  <link rel="stylesheet" href="<%= cdnStylesheet.href %>" integrity="<%= cdnStylesheet.integrity %>" crossorigin="anonymous">
-  <link rel="stylesheet" href="/static/css/app.css">
-  <link rel="icon" href="data:,">
-</head>
-<body>
-  <header class="container">
-    <nav>
-      <ul><li><a href="/" class="brand"><strong>SecureVault</strong></a></li></ul>
-      <ul>
-        <% if (currentUser) { %>
-          <li><a href="/notes">Notas</a></li>
-          <li><a href="/profile">Perfil</a></li>
-          <% if (currentUser.role === 'admin') { %><li><a href="/admin">Admin</a></li><% } %>
-          <li>
-            <form method="post" action="/logout" class="inline">
-              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-              <button type="submit" class="secondary outline small">Salir</button>
-            </form>
-          </li>
-        <% } else { %>
-          <li><a href="/login">Entrar</a></li>
-          <li><a href="/register">Crear cuenta</a></li>
-        <% } %>
-      </ul>
-    </nav>
+<%- include('head') %>
+<body class="app">
+  <a class="skip" href="#contenido">Saltar al contenido</a>
+  <header class="topbar">
+    <a href="/" class="brand">
+      <%- include('seal', { sealClass: 'seal-sm' }) %>
+      <span class="wordmark">Sigilo</span>
+    </a>
+    <% if (currentUser) { %>
+      <nav class="mainnav" aria-label="Principal">
+        <a href="/notes">Notas</a>
+        <a href="/profile">Perfil</a>
+        <% if (currentUser.role === 'admin') { %><a href="/admin">Administración</a><% } %>
+      </nav>
+      <div class="session">
+        <span class="who"><%= currentUser.name %></span>
+        <form method="post" action="/logout">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button type="submit" class="btn btn-quiet">Salir</button>
+        </form>
+      </div>
+    <% } else { %>
+      <nav class="mainnav" aria-label="Principal">
+        <a href="/login">Entrar</a>
+        <a href="/register">Crear cuenta</a>
+      </nav>
+    <% } %>
   </header>
-  <main class="container">
+  <main id="contenido" class="page">

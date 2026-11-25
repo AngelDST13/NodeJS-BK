@@ -18,11 +18,25 @@ import { adminRouter } from './routes/admin.js';
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
 
-// Hoja de estilos de CDN con Subresource Integrity (A08): si el CDN la altera, el navegador no la carga.
-export const CDN_STYLESHEET = Object.freeze({
-  href: 'https://cdn.jsdelivr.net/npm/@picocss/pico@2.1.1/css/pico.min.css',
-  integrity: 'sha384-L1dWfspMTHU/ApYnFiMz2QID/PlP1xCW9visvBdbEkOLkSSWsP6ZJWhPw6apiXxU',
-});
+// Hojas de estilo (tipografías) de CDN con versión fija y Subresource Integrity (A08):
+// si el CDN las altera, el navegador no las carga.
+export const CDN_STYLESHEETS = Object.freeze([
+  {
+    href: 'https://cdn.jsdelivr.net/npm/@fontsource/gloock@5.2.5/latin.css',
+    integrity: 'sha384-313qU6yoESmrWmKYarsPOs2SdlhjQeZ90M2iqBAUvGrpDDDNnMJotfqPezVfxUXA',
+  },
+  {
+    href: 'https://cdn.jsdelivr.net/npm/@fontsource-variable/schibsted-grotesk@5.2.8/wght.css',
+    integrity: 'sha384-+QBjh8Rf2AeMZ97jKneMOAzYlmUZVgvG+wIQm9+YdOYQGlz5eP08S9+QYKyIYhDc',
+  },
+]);
+
+const dateFormatters = new Map();
+const formatDate = (date, options = { dateStyle: 'medium', timeStyle: 'short' }) => {
+  const key = JSON.stringify(options);
+  if (!dateFormatters.has(key)) dateFormatters.set(key, new Intl.DateTimeFormat('es', options));
+  return dateFormatters.get(key).format(date);
+};
 
 export const createApp = () => {
   const app = express();
@@ -53,7 +67,7 @@ export const createApp = () => {
           scriptSrc: ["'self'"], // sin 'unsafe-inline': un <script> inyectado no se ejecuta
           styleSrc: ["'self'", 'https://cdn.jsdelivr.net'],
           imgSrc: ["'self'", 'data:'],
-          fontSrc: ["'self'"],
+          fontSrc: ["'self'", 'https://cdn.jsdelivr.net'],
           connectSrc: ["'self'"],
           objectSrc: ["'none'"],
           baseUri: ["'none'"],
@@ -66,7 +80,7 @@ export const createApp = () => {
       // same-origin: nunca envía la URL (p. ej. con el token de recuperación) a otros sitios,
       // pero mantiene la cabecera Origin real en los POST propios (no-referrer la vuelve "null").
       referrerPolicy: { policy: 'same-origin' },
-      crossOriginEmbedderPolicy: false, // la hoja de estilos del CDN se carga con SRI + CORS
+      crossOriginEmbedderPolicy: false, // las tipografías del CDN se cargan con SRI + CORS
     }),
   );
   app.use((req, res, next) => {
@@ -77,8 +91,9 @@ export const createApp = () => {
   app.use('/static', express.static(path.join(rootDir, '..', 'public'), { maxAge: '7d', index: false }));
   app.use((req, res, next) => {
     res.set('Cache-Control', 'no-store'); // páginas con datos privados no se guardan en caché
-    res.locals.cdnStylesheet = CDN_STYLESHEET;
-    res.locals.title = 'SecureVault';
+    res.locals.cdnStylesheets = CDN_STYLESHEETS;
+    res.locals.formatDate = formatDate;
+    res.locals.title = 'Sigilo';
     res.locals.currentUser = null;
     next();
   });

@@ -1,18 +1,27 @@
 <%- include('../partials/header') %>
-<hgroup>
-  <h1>Mis notas</h1>
-  <p><%= notes.length %> de <%= limits.maxNotesPerUser %> notas · cifradas en la base de datos</p>
-</hgroup>
+<div class="page-head">
+  <div>
+    <h1>Tus notas</h1>
+    <p class="count"><%= notes.length %> de <%= limits.maxNotesPerUser %> notas</p>
+  </div>
+  <% if (notes.length > 0) { %><a href="/notes/new" class="btn btn-primary">Nueva nota</a><% } %>
+</div>
 <%- include('../partials/messages') %>
-<p><a href="/notes/new" role="button">Nueva nota</a></p>
 <% if (notes.length === 0) { %>
-  <p>Aún no tienes notas.</p>
+  <section class="empty">
+    <%- include('../partials/seal', { sealClass: 'seal-md seal-muted' }) %>
+    <h2>Todavía no hay notas</h2>
+    <p>Escribe la primera. Se guarda cifrada en cuanto la guardas.</p>
+    <a href="/notes/new" class="btn btn-primary">Escribir una nota</a>
+  </section>
 <% } else { %>
-  <ul class="note-list">
+  <ul class="ledger">
     <% notes.forEach((n) => { %>
       <li>
-        <a href="/notes/<%= n.id %>"><%= n.title %></a>
-        <small>actualizada <%= n.updatedAt.toLocaleString('es') %></small>
+        <a href="/notes/<%= n.id %>">
+          <span class="ledger-title"><%= n.title %></span>
+          <time datetime="<%= n.updatedAt.toISOString() %>"><%= formatDate(n.updatedAt) %></time>
+        </a>
       </li>
     <% }) %>
   </ul>

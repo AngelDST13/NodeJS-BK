@@ -1,28 +1,32 @@
 <%- include('partials/header') %>
-<h1>Administración</h1>
+<div class="page-head"><h1>Administración</h1></div>
 <%- include('partials/messages') %>
 
-<section>
-  <h2>Usuarios</h2>
+<section class="block">
+  <h2>Usuarios <span class="count"><%= users.length %></span></h2>
   <div class="table-wrap">
     <table>
-      <thead><tr><th>Correo</th><th>Nombre</th><th>Rol</th><th>Estado</th><th>Alta</th><th>Cambiar rol</th></tr></thead>
+      <thead><tr><th>Correo</th><th>Nombre</th><th>Rol</th><th>Estado</th><th>Alta</th><th><span class="visually-hidden">Acciones</span></th></tr></thead>
       <tbody>
         <% users.forEach((u) => { %>
           <tr>
             <td><%= u.email %></td>
             <td><%= u.name %></td>
-            <td><%= u.role %></td>
-            <td><%= u.locked ? 'Bloqueado' : (u.failed_login_count > 0 ? `${u.failed_login_count} fallos` : 'Activo') %></td>
-            <td><%= u.created_at.toLocaleDateString('es') %></td>
+            <td><span class="tag <%= u.role === 'admin' ? 'tag-admin' : '' %>"><%= u.role === 'admin' ? 'Administrador' : 'Usuario' %></span></td>
             <td>
+              <% if (u.locked) { %><span class="tag tag-warn">Bloqueado</span>
+              <% } else if (u.failed_login_count > 0) { %><%= u.failed_login_count %> intentos fallidos
+              <% } else { %>Activo<% } %>
+            </td>
+            <td><%= formatDate(u.created_at, { dateStyle: 'medium' }) %></td>
+            <td class="cell-action">
               <% if (u.id !== currentUser.id) { %>
-                <form method="post" action="/admin/users/<%= u.id %>/role" class="inline">
+                <form method="post" action="/admin/users/<%= u.id %>/role">
                   <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                   <input type="hidden" name="role" value="<%= u.role === 'admin' ? 'user' : 'admin' %>">
-                  <button type="submit" class="secondary outline small"><%= u.role === 'admin' ? 'Quitar admin' : 'Hacer admin' %></button>
+                  <button type="submit" class="btn btn-quiet btn-sm"><%= u.role === 'admin' ? 'Quitar administrador' : 'Hacer administrador' %></button>
                 </form>
-              <% } else { %>—<% } %>
+              <% } else { %><span class="hint">Tú</span><% } %>
             </td>
           </tr>
         <% }) %>
@@ -31,22 +35,22 @@
   </div>
 </section>
 
-<section>
+<section class="block">
   <h2>Bitácora de seguridad</h2>
-  <p><small>Últimos 100 eventos. La columna «Integridad» verifica el HMAC-SHA256 de cada registro.</small></p>
+  <p class="hint">Últimos 100 eventos. Cada registro lleva una firma HMAC; si alguien lo modifica directamente en la base de datos, aparece como alterado.</p>
   <div class="table-wrap">
-    <table>
-      <thead><tr><th>Fecha</th><th>Evento</th><th>Actor</th><th>Objetivo</th><th>IP</th><th>Detalle</th><th>Integridad</th></tr></thead>
+    <table class="log">
+      <thead><tr><th>Fecha</th><th>Evento</th><th>Actor</th><th>Objetivo</th><th>IP</th><th>Detalle</th><th>Firma</th></tr></thead>
       <tbody>
         <% events.forEach((e) => { %>
           <tr class="<%= e.intact ? '' : 'tampered' %>">
-            <td><%= e.occurred_at.toLocaleString('es') %></td>
+            <td class="nowrap"><%= formatDate(e.occurred_at) %></td>
             <td><code><%= e.event_type %></code></td>
             <td><%= e.actor_email || '—' %></td>
-            <td><small><%= e.target_id || '—' %></small></td>
+            <td class="small"><%= e.target_id || '—' %></td>
             <td><%= e.ip || '—' %></td>
-            <td><small><%= JSON.stringify(e.details) %></small></td>
-            <td><%= e.intact ? 'OK' : 'ALTERADO' %></td>
+            <td class="small"><%= JSON.stringify(e.details) %></td>
+            <td><% if (e.intact) { %><span class="tag tag-ok">OK</span><% } else { %><span class="tag tag-bad">ALTERADO</span><% } %></td>
           </tr>
         <% }) %>
       </tbody>

@@ -1,23 +1,27 @@
 <%- include('partials/header') %>
-<article class="narrow">
-  <h1>Mi perfil</h1>
-  <%- include('partials/messages') %>
-  <dl>
-    <dt>Correo</dt><dd><%= profile.email %></dd>
-    <dt>Rol</dt><dd><%= profile.role === 'admin' ? 'Administrador' : 'Usuario' %></dd>
-    <dt>Teléfono</dt><dd><%= profile.maskedPhone || 'Sin registrar' %></dd>
+<div class="page-head"><h1>Tu perfil</h1></div>
+<%- include('partials/messages') %>
+<div class="profile">
+  <dl class="facts">
+    <div><dt>Correo</dt><dd><%= profile.email %></dd></div>
+    <div><dt>Rol</dt><dd><%= profile.role === 'admin' ? 'Administrador' : 'Usuario' %></dd></div>
+    <div><dt>Teléfono</dt><dd><%= profile.maskedPhone || 'Sin registrar' %></dd></div>
+    <div><dt>Miembro desde</dt><dd><%= formatDate(profile.createdAt, { dateStyle: 'long' }) %></dd></div>
   </dl>
-  <form method="post" action="/profile" novalidate>
+  <form method="post" action="/profile" class="stack panel" novalidate>
+    <h2>Editar datos</h2>
     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-    <label>Nombre
-      <input type="text" name="name" value="<%= profile.name %>" required maxlength="80">
-    </label>
-    <label>Teléfono (se guarda cifrado)
-      <input type="tel" name="phone" value="" maxlength="20" autocomplete="off"
+    <div class="field">
+      <label for="name">Nombre</label>
+      <input id="name" type="text" name="name" value="<%= profile.name %>" required maxlength="80" autocomplete="name">
+    </div>
+    <div class="field">
+      <label for="phone">Teléfono</label>
+      <input id="phone" type="tel" name="phone" value="" maxlength="20" autocomplete="off" aria-describedby="phone-help"
              placeholder="<%= profile.maskedPhone || '+57 300 123 4567' %>">
-      <small>Escribe un número para reemplazarlo; déjalo vacío para borrarlo.</small>
-    </label>
-    <button type="submit">Guardar</button>
+      <p id="phone-help" class="hint">Se guarda cifrado y solo se muestran los últimos 4 dígitos. Escribe uno nuevo para reemplazarlo o deja el campo vacío para borrarlo.</p>
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar cambios</button>
   </form>
-</article>
+</div>
 <%- include('partials/footer') %>

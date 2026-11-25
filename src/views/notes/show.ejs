@@ -1,15 +1,16 @@
 <%- include('../partials/header') %>
-<article>
-  <header><h1><%= note.title %></h1></header>
+<article class="sheet">
+  <a href="/notes" class="back">Tus notas</a>
+  <h1 class="sheet-title"><%= note.title %></h1>
+  <p class="sheet-meta">Editada el <time datetime="<%= note.updatedAt.toISOString() %>"><%= formatDate(note.updatedAt) %></time></p>
   <%# La etiqueta de salida con signo igual escapa HTML: un script guardado se muestra como texto (A05) %>
-  <div class="note-body"><%= note.body %></div>
-  <footer class="actions">
-    <a href="/notes/<%= note.id %>/edit" role="button" class="secondary">Editar</a>
-    <form method="post" action="/notes/<%= note.id %>/delete" class="inline">
+  <div class="sheet-body"><%= note.body %></div>
+  <div class="actions">
+    <a href="/notes/<%= note.id %>/edit" class="btn btn-secondary">Editar</a>
+    <form method="post" action="/notes/<%= note.id %>/delete">
       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-      <button type="submit" class="contrast">Eliminar</button>
+      <button type="submit" class="btn btn-danger">Eliminar nota</button>
     </form>
-    <a href="/notes">Volver</a>
-  </footer>
+  </div>
 </article>
 <%- include('../partials/footer') %>

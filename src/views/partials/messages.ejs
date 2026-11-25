@@ -1,8 +1,12 @@
 <% if (typeof flash !== 'undefined' && flash) { %>
-  <p class="notice" role="status"><%= flash %></p>
+  <p class="msg msg-ok" role="status"><%= flash %></p>
 <% } %>
 <% if (typeof errors !== 'undefined' && errors.length) { %>
-  <div class="errors" role="alert">
-    <ul><% errors.forEach((e) => { %><li><%= e %></li><% }) %></ul>
+  <div class="msg msg-error" role="alert">
+    <% if (errors.length === 1) { %>
+      <p><%= errors[0] %></p>
+    <% } else { %>
+      <ul><% errors.forEach((e) => { %><li><%= e %></li><% }) %></ul>
+    <% } %>
   </div>
 <% } %>

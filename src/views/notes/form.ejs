@@ -1,18 +1,21 @@
 <%- include('../partials/header') %>
-<article>
-  <h1><%= title %></h1>
+<article class="sheet">
+  <a href="<%= note.id ? `/notes/${note.id}` : '/notes' %>" class="back"><%= note.id ? 'Volver a la nota' : 'Tus notas' %></a>
+  <h1 class="visually-hidden"><%= title %></h1>
   <%- include('../partials/messages') %>
-  <form method="post" action="<%= note.id ? `/notes/${note.id}` : '/notes' %>" novalidate>
+  <form method="post" action="<%= note.id ? `/notes/${note.id}` : '/notes' %>" class="editor" novalidate>
     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-    <label>Título
-      <input type="text" name="title" value="<%= note.title || '' %>" required maxlength="<%= limits.maxNoteTitle %>">
-    </label>
-    <label>Contenido
-      <textarea name="body" rows="10" maxlength="<%= limits.maxNoteBody %>"><%= note.body || '' %></textarea>
-      <small>Máximo <%= limits.maxNoteBody %> caracteres.</small>
-    </label>
-    <button type="submit">Guardar</button>
-    <a href="<%= note.id ? `/notes/${note.id}` : '/notes' %>">Cancelar</a>
+    <label for="title" class="visually-hidden">Título</label>
+    <input id="title" type="text" name="title" class="editor-title" value="<%= note.title || '' %>" placeholder="Título" required maxlength="<%= limits.maxNoteTitle %>" autofocus>
+    <label for="body" class="visually-hidden">Contenido</label>
+    <textarea id="body" name="body" class="editor-body" rows="14" maxlength="<%= limits.maxNoteBody %>" placeholder="Escribe aquí. Nadie más puede leerlo." aria-describedby="body-help"><%= note.body || '' %></textarea>
+    <div class="editor-foot">
+      <p id="body-help" class="hint">Hasta <%= limits.maxNoteBody %> caracteres.</p>
+      <div class="actions">
+        <a href="<%= note.id ? `/notes/${note.id}` : '/notes' %>" class="btn btn-quiet">Cancelar</a>
+        <button type="submit" class="btn btn-primary"><%= note.id ? 'Guardar cambios' : 'Guardar nota' %></button>
+      </div>
+    </div>
   </form>
 </article>
 <%- include('../partials/footer') %>
