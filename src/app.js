@@ -13,6 +13,7 @@ import { csrfProtection } from './middleware/csrf.js';
 import { globalLimiter } from './middleware/rateLimit.js';
 import { notFound, errorHandler } from './middleware/errors.js';
 import { healthRouter } from './routes/health.js';
+import { homeRouter } from './routes/home.js';
 import { authRouter } from './routes/auth.js';
 import { notesRouter } from './routes/notes.js';
 import { profileRouter } from './routes/profile.js';
@@ -36,10 +37,14 @@ export const CDN_STYLESHEETS = Object.freeze([
 
 // Versión de la hoja de estilos según su contenido: cada cambio genera una URL nueva,
 // así el navegador nunca mezcla HTML nuevo con un CSS viejo guardado en caché.
-const stylesheetPath = path.join(rootDir, '..', 'public', 'css', 'app.css');
-const hashFile = (file) => createHash('sha256').update(readFileSync(file)).digest('hex').slice(0, 12);
-const productionAssetVersion = config.isProduction ? hashFile(stylesheetPath) : null;
-const assetVersion = () => productionAssetVersion ?? hashFile(stylesheetPath);
+const versionedAssets = ['css/app.css', 'js/meter.js'].map((f) => path.join(rootDir, '..', 'public', f));
+const hashAssets = () => {
+  const hash = createHash('sha256');
+  for (const file of versionedAssets) hash.update(readFileSync(file));
+  return hash.digest('hex').slice(0, 12);
+};
+const productionAssetVersion = config.isProduction ? hashAssets() : null;
+const assetVersion = () => productionAssetVersion ?? hashAssets();
 
 const dateFormatters = new Map();
 const formatDate = (date, options = { dateStyle: 'medium', timeStyle: 'short' }) => {
@@ -148,7 +153,7 @@ export const createApp = () => {
   app.use(loadUser);
   app.use(csrfProtection);
 
-  app.get('/', (req, res) => res.redirect(303, req.user ? '/notes' : '/login'));
+  app.use(homeRouter);
   app.use(authRouter);
   app.use('/notes', notesRouter);
   app.use('/profile', profileRouter);

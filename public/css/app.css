@@ -328,3 +328,83 @@ tr.tampered td { background: var(--danger-wash); }
 .demo dt { font-size: var(--step--1); color: var(--muted); margin-bottom: 0.2rem; }
 .demo dd { margin: 0; font-size: 0.9375rem; overflow-wrap: anywhere; user-select: all; }
 @media (max-width: 420px) { .demo dl { grid-template-columns: 1fr; } }
+
+td.cell-action form { display: inline-block; }
+
+/* ---------- Página de inicio pública ---------- */
+
+.page:has(.hero) { max-width: 74rem; }
+.page:has(.hero) > section + section,
+.page:has(.hero) > .tally + section { margin-top: clamp(4rem, 9vw, 7rem); }
+
+.hero { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: clamp(2rem, 5vw, 4.5rem); align-items: center; }
+.hero h1 { font-size: clamp(2.6rem, 5.6vw, 4.6rem); line-height: 1.02; letter-spacing: -0.02em; max-width: 13ch; }
+.hero-lede { font-size: var(--step-1); line-height: 1.5; color: var(--muted); margin-top: 1.5rem; max-width: 46ch; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
+
+/* La "evidencia": lo que se llevaría quien robe la base de datos. Siempre oscura. */
+.evidence {
+  margin: 0; position: relative;
+  background: #18203a; color: #e6e9f4;
+  border-radius: 20px; padding: 2.25rem 1.75rem 1.5rem;
+}
+.evidence .seal-evidence { position: absolute; top: -1.6rem; right: 1.5rem; width: 4rem; height: 4rem; color: #8b97ff; }
+.evidence .seal-evidence .seal-cut { fill: #18203a; }
+.evidence .seal-evidence .seal-ring { stroke: #18203a; }
+.evidence dl { margin: 0; display: grid; gap: 1.1rem; }
+.evidence dt { font-size: var(--step--1); color: #9aa3c0; margin-bottom: 0.3rem; }
+.evidence dd { margin: 0; }
+.evidence code { font-size: 0.8125rem; line-height: 1.55; color: #c9cffb; overflow-wrap: anywhere; word-break: break-all; }
+.evidence figcaption { margin-top: 1.4rem; padding-top: 1rem; border-top: 1px solid #2e3555; font-size: var(--step--1); color: #9aa3c0; }
+
+.tally { margin-top: clamp(2.5rem, 5vw, 3.5rem); font-size: var(--step-1); line-height: 1.5; max-width: 60ch; }
+.tally strong { font-family: var(--font-display); font-weight: 400; font-size: 1.6em; color: var(--cobalt); line-height: 1; }
+
+.challenge { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(2rem, 5vw, 4rem); align-items: start; scroll-margin-top: 1.5rem; }
+.challenge h2 { margin-bottom: 1rem; }
+.challenge-form > p { color: var(--muted); max-width: 48ch; }
+.rules { margin: 1.25rem 0 1.75rem; padding-left: 1.1rem; display: grid; gap: 0.4rem; }
+.rules li::marker { color: var(--cobalt); }
+.challenge-result { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: clamp(1.25rem, 3vw, 2rem); }
+.challenge-result h3 { margin: 0 0 1rem; font-size: var(--step-0); font-weight: 600; color: var(--muted); }
+.verdict { font-family: var(--font-display); font-size: var(--step-2); line-height: 1.2; }
+.verdict-stop { color: var(--danger); }
+.verdict-open { color: var(--ok); }
+.trace { margin: 1.1rem 0 0; padding-left: 1.1rem; display: grid; gap: 0.5rem; }
+.trace strong { color: var(--ink); }
+.aside-note { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--line); color: var(--muted); font-size: var(--step--1); }
+.opened-note { margin-top: 1rem; padding: 1rem; border-radius: var(--radius-field); background: var(--ok-wash); }
+.opened-note p { margin-top: 0.4rem; }
+
+.meter > p { color: var(--muted); max-width: 60ch; margin-top: 0.75rem; }
+.meter-field { max-width: 30rem; margin-top: 1.75rem; }
+.meter-input-row { display: flex; gap: 0.5rem; align-items: center; }
+.meter-rows { list-style: none; margin: 2rem 0 1rem; padding: 0; border-top: 1.5px solid var(--ink); }
+.meter-rows li {
+  display: grid; grid-template-columns: minmax(12rem, 1.3fr) minmax(8rem, 2fr) minmax(9rem, 1fr);
+  gap: 1.25rem; align-items: center; padding: 1rem 0; border-bottom: 1px solid var(--line);
+}
+.meter-label { font-weight: 500; }
+.meter-bar { height: 0.6rem; border-radius: 999px; background: var(--line); overflow: hidden; }
+.meter-bar > span { display: block; height: 100%; width: 0; border-radius: inherit; background: var(--muted); transition: width 300ms ease, background-color 300ms ease; }
+.meter-rows li[data-level='weak'] .meter-bar > span { background: var(--danger); }
+.meter-rows li[data-level='fair'] .meter-bar > span { background: var(--warn); }
+.meter-rows li[data-level='strong'] .meter-bar > span { background: var(--ok); }
+.meter-time { text-align: right; font-weight: 600; }
+
+.promises dl { margin: 2rem 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 clamp(2rem, 5vw, 4rem); }
+.promises dl > div { padding: 1.4rem 0; border-top: 1.5px solid var(--ink); }
+.promises dt { font-family: var(--font-display); font-size: var(--step-1); margin-bottom: 0.5rem; }
+.promises dd { margin: 0; color: var(--muted); max-width: 52ch; }
+
+.closing { display: grid; justify-items: start; gap: 1rem; padding: clamp(2rem, 5vw, 3rem) 0 1rem; }
+.closing p { color: var(--muted); }
+.closing .hero-actions { margin-top: 0.5rem; }
+
+@media (max-width: 860px) {
+  .hero, .challenge { grid-template-columns: 1fr; }
+  .promises dl { grid-template-columns: 1fr; }
+  .meter-rows li { grid-template-columns: 1fr auto; gap: 0.5rem 1rem; }
+  .meter-label { grid-column: 1 / -1; }
+  .meter-time { text-align: right; }
+}

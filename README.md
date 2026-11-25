@@ -23,6 +23,16 @@ Es una aplicación web para guardar notas privadas y un dato sensible de perfil 
 | RF-07 | Panel admin: usuarios, cambio de rol y bitácora con verificación HMAC | `src/routes/admin.js`, `src/services/audit.js` |
 | RF-08 | `GET /health` → `{"status":"ok"}` sin versiones | `src/routes/health.js` |
 
+## Página de inicio: el reto del sello
+
+La portada pública (`/`) muestra el hash Argon2id real y la nota cifrada real de una cuenta pública (`sello@reto.sigilo`), es decir, lo que se llevaría quien robe la base de datos, y reta a abrirla:
+
+- **Fuerza bruta en vivo:** el formulario prueba contraseñas contra esa cuenta usando la misma lógica del login (Argon2id, bloqueo progresivo, bitácora firmada, alerta). Muestra cuánto tardó Argon2id, cuántos intentos quedan y responde **HTTP 429** al sexto intento en 15 minutos. Tiene su propio límite por IP para que jugar no bloquee tu cuenta real.
+- **Calculadora de resistencia:** compara cuánto tardaría en romperse una contraseña guardada con MD5, con Argon2id o probándola en línea contra Sigilo. Corre solo en el navegador (`public/js/meter.js`); no envía nada.
+- **Qué hace Sigilo con tus datos:** cada protección explicada en lenguaje simple.
+
+La contraseña de la cuenta del reto es aleatoria (192 bits), se genera al crearla y no se guarda en ningún lado. Esa cuenta no puede recibir enlaces de recuperación. Si se bloquea, un administrador puede desbloquearla desde el panel.
+
 ## Stack
 
 Node.js 26 (LTS activa desde el 28/10/2026) · Express 5 · PostgreSQL (`pg`, consultas parametrizadas) · EJS (escape automático) · helmet · express-rate-limit · express-session + connect-pg-simple · zod · argon2 · `node:crypto` · pino (logs JSON) · nodemailer.
@@ -53,7 +63,7 @@ Sin `SMTP_URL`, el enlace de recuperación de contraseña se imprime en la conso
 npm test
 ```
 
-46 pruebas cubren los requisitos funcionales y las evidencias OWASP (IDOR, XSS, inyección SQL, fuerza bruta → 429, CSRF, cabeceras, modo producción (HTTPS, HSTS, configuración insegura rechazada), cifrado en BD, rotación de llaves, etc.).
+55 pruebas cubren los requisitos funcionales y las evidencias OWASP (IDOR, XSS, inyección SQL, fuerza bruta → 429, CSRF, cabeceras, modo producción (HTTPS, HSTS, configuración insegura rechazada), cifrado en BD, rotación de llaves, etc.).
 
 ## Variables de entorno
 

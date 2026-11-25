@@ -20,6 +20,12 @@
             </td>
             <td><%= formatDate(u.created_at, { dateStyle: 'medium' }) %></td>
             <td class="cell-action">
+              <% if (u.locked || u.failed_login_count > 0) { %>
+                <form method="post" action="/admin/users/<%= u.id %>/unlock">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <button type="submit" class="btn btn-quiet btn-sm">Desbloquear</button>
+                </form>
+              <% } %>
               <% if (u.id !== currentUser.id) { %>
                 <form method="post" action="/admin/users/<%= u.id %>/role">
                   <input type="hidden" name="_csrf" value="<%= csrfToken %>">

@@ -115,6 +115,7 @@ sequenceDiagram
 | T16 | **E**levation of privilege | Enviar `role=admin` en el formulario de perfil | Esquemas zod estrictos (campos extra descartados); rol solo cambia vía panel admin | A01 |
 | T17 | **E**levation of privilege | Usuario normal accede a `/admin` | `requireRole('admin')` con el rol leído de la BD en cada petición; 403 + evento | A01 |
 | T18 | **E**levation of privilege | SSRF a través del webhook de alertas (p. ej. a `169.254.169.254`) | Solo HTTPS, host en lista blanca, sin redirecciones, timeout 3 s | A01 |
+| T20 | **S**poofing / **D**oS | El reto público (`/reto`) se usa para fuerza bruta masiva o para bloquear la cuenta del reto | Límite propio de 5 intentos/IP/15 min (429), bloqueo progresivo, contraseña aleatoria de 192 bits que no existe en ningún archivo, sin sesión al acertar, sin recuperación de contraseña para esa cuenta, desbloqueo manual por administrador | A07 |
 | T19 | Cadena de suministro | Dependencia comprometida o vulnerable | `package-lock.json`, `npm ci`, `npm audit --audit-level=high` en CI, Dependabot, 11 dependencias directas | A03 |
 
 ## Límites de negocio

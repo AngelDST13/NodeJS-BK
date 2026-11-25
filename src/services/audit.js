@@ -17,6 +17,7 @@ export const AuditEvent = Object.freeze({
   PASSWORD_RESET_COMPLETED: 'auth.password_reset.completed',
   ACCESS_DENIED: 'authz.access_denied',
   ROLE_CHANGED: 'admin.role_changed',
+  ACCOUNT_UNLOCKED: 'admin.account_unlocked',
   RATE_LIMITED: 'security.rate_limited',
   CSRF_REJECTED: 'security.csrf_rejected',
 });

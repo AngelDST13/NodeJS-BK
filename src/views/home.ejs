@@ -1,0 +1,161 @@
+<%- include('partials/header') %>
+
+<section class="hero">
+  <div class="hero-copy">
+    <h1>Te mostramos lo que robaría un atacante.</h1>
+    <p class="hero-lede">Esta es una cuenta real de Sigilo, tal como está guardada en nuestra base de datos: la contraseña convertida en una huella Argon2id y la nota cifrada con AES-256-GCM. Ábrela si puedes.</p>
+    <div class="hero-actions">
+      <a href="#reto" class="btn btn-primary">Intentar abrir el sello</a>
+      <a href="/register" class="btn btn-secondary">Crear mi libreta</a>
+    </div>
+  </div>
+
+  <figure class="evidence" aria-labelledby="evidence-caption">
+    <%- include('partials/seal', { sealClass: 'seal-evidence' }) %>
+    <dl>
+      <div><dt>Cuenta</dt><dd><code><%= evidence.email %></code></dd></div>
+      <div><dt>Contraseña guardada</dt><dd><code><%= evidence.passwordHash %></code></dd></div>
+      <div><dt>Nota guardada</dt><dd><code><%= evidence.noteCipher %></code></dd></div>
+    </dl>
+    <figcaption id="evidence-caption">Datos en vivo, leídos de la base de datos al cargar esta página.</figcaption>
+  </figure>
+</section>
+
+<p class="tally">
+  Hasta ahora: <strong><%= evidence.stats.attempts %></strong> intentos fallidos,
+  <strong><%= evidence.stats.throttled %></strong> frenados por el límite de velocidad,
+  <strong><%= evidence.stats.locks %></strong> bloqueos de la cuenta y
+  <strong><%= evidence.stats.opened %></strong> aperturas.
+</p>
+
+<section id="reto" class="challenge" aria-labelledby="reto-title">
+  <div class="challenge-form">
+    <h2 id="reto-title">Pon a prueba el sello</h2>
+    <p>Prueba contraseñas contra la cuenta <code><%= evidence.email %></code>. Pasan por el mismo inicio de sesión que usan las cuentas reales.</p>
+    <ul class="rules">
+      <li>Tienes <%= challengeLimit %> intentos cada 15 minutos desde tu conexión.</li>
+      <li>Tras 5 fallos seguidos, la cuenta se bloquea 1, 2, 4… hasta 60 minutos, para todos.</li>
+      <li>La contraseña es aleatoria, de 32 caracteres, y nadie la conoce: ni siquiera el equipo.</li>
+    </ul>
+    <form method="post" action="/reto" class="stack" novalidate>
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <div class="field">
+        <label for="reto-password">Contraseña a probar</label>
+        <input id="reto-password" type="text" name="password" maxlength="128" autocomplete="off" spellcheck="false" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Probar contraseña</button>
+    </form>
+  </div>
+
+  <div class="challenge-result" aria-live="polite">
+    <h3>Lo que hizo el servidor</h3>
+    <% if (!result) { %>
+      <p class="hint">Aquí verás qué pasó con tu intento: cuánto tardó la verificación, cuántos intentos te quedan y si la cuenta se bloqueó.</p>
+    <% } else if (result.outcome === 'opened') { %>
+      <p class="verdict verdict-open">Abriste el sello.</p>
+      <% if (result.note) { %>
+        <div class="opened-note"><strong><%= result.note.title %></strong><p><%= result.note.body %></p></div>
+      <% } %>
+    <% } else if (result.outcome === 'throttled') { %>
+      <p class="verdict verdict-stop">HTTP 429: demasiados intentos.</p>
+      <ul class="trace">
+        <li>Tu conexión agotó sus <%= challengeLimit %> intentos. Vuelve en <%= result.retryMinutes %> min.</li>
+        <li>Esta vez ni siquiera se comprobó la contraseña: el límite frena antes de gastar recursos.</li>
+        <li>El bloqueo quedó registrado en la bitácora de seguridad.</li>
+      </ul>
+    <% } else if (result.outcome === 'invalid') { %>
+      <p class="verdict"><%= result.message %></p>
+    <% } else { %>
+      <p class="verdict verdict-stop"><%= result.outcome === 'locked' ? `La cuenta está bloqueada ${result.lockedMinutes} min.` : 'Contraseña incorrecta.' %></p>
+      <ul class="trace">
+        <li>Argon2id tardó <strong><%= result.ms %> ms</strong> en comprobarla. Es lento a propósito.</li>
+        <li>Te quedan <strong><%= result.remaining %></strong> de <%= challengeLimit %> intentos en esta ventana.</li>
+        <li>La cuenta lleva <strong><%= result.failedInARow %></strong> fallos seguidos<% if (result.lockedMinutes > 0) { %> y está bloqueada <strong><%= result.lockedMinutes %> min</strong>, aunque acertaras<% } %>.</li>
+        <li>El intento quedó en la bitácora, firmado con HMAC para que nadie lo borre sin que se note.</li>
+      </ul>
+    <% } %>
+    <p class="aside-note">En el inicio de sesión real, Sigilo no da estos detalles: responde siempre lo mismo para no ayudar a quien ataca. Aquí los mostramos para que veas qué pasa por dentro.</p>
+  </div>
+</section>
+
+<section class="meter" aria-labelledby="meter-title">
+  <h2 id="meter-title">¿Cuánto resiste tu contraseña?</h2>
+  <p>Escribe una contraseña y compara cuánto tardaría alguien en adivinarla según cómo se guarde. El cálculo ocurre en tu navegador: no se envía a ningún lado.</p>
+  <div class="field meter-field">
+    <label for="meter-input">Contraseña</label>
+    <div class="meter-input-row">
+      <input id="meter-input" type="password" autocomplete="off" spellcheck="false" maxlength="128">
+      <button type="button" class="btn btn-quiet btn-sm" id="meter-toggle" aria-pressed="false">Mostrar</button>
+    </div>
+  </div>
+  <noscript><p class="hint">Activa JavaScript para usar la calculadora.</p></noscript>
+  <ol class="meter-rows" id="meter-rows">
+    <li data-scenario="md5">
+      <span class="meter-label">Guardada con MD5, como en sistemas mal diseñados</span>
+      <span class="meter-bar"><span></span></span>
+      <span class="meter-time">—</span>
+    </li>
+    <li data-scenario="argon">
+      <span class="meter-label">Guardada con Argon2id, como en Sigilo</span>
+      <span class="meter-bar"><span></span></span>
+      <span class="meter-time">—</span>
+    </li>
+    <li data-scenario="online">
+      <span class="meter-label">Probándola en línea contra Sigilo</span>
+      <span class="meter-bar"><span></span></span>
+      <span class="meter-time">—</span>
+    </li>
+  </ol>
+  <p class="hint" id="meter-note">Estimación para una contraseña elegida al azar. Si es una palabra común o un patrón conocido, cae mucho antes.</p>
+</section>
+
+<section class="promises" aria-labelledby="promises-title">
+  <h2 id="promises-title">Qué hace Sigilo con tus datos</h2>
+  <dl>
+    <div>
+      <dt>Tu contraseña</dt>
+      <dd>Nunca la guardamos. Guardamos una huella Argon2id con sal propia; para comprobarla hay que gastar 19 MiB de memoria por intento, y eso vuelve inútiles las tarjetas gráficas de los atacantes.</dd>
+    </div>
+    <div>
+      <dt>Tus notas</dt>
+      <dd>Se cifran con AES-256-GCM antes de tocar la base de datos, con un vector nuevo en cada guardado. Si alguien altera un solo byte, la nota se niega a abrirse.</dd>
+    </div>
+    <div>
+      <dt>Tu teléfono</dt>
+      <dd>Cifrado igual que las notas y mostrado solo como ***-***-1234.</dd>
+    </div>
+    <div>
+      <dt>Tu sesión</dt>
+      <dd>Una cookie que el JavaScript de la página no puede leer, que solo viaja por HTTPS y a nuestro propio sitio. Cambia al entrar y caduca a los 30 minutos sin uso.</dd>
+    </div>
+    <div>
+      <dt>Otras personas</dt>
+      <dd>No pueden abrir tus notas aunque adivinen su dirección: el servidor comprueba en cada consulta que la nota sea tuya.</dd>
+    </div>
+    <div>
+      <dt>Quien intente adivinar</dt>
+      <dd>Pocos intentos por conexión y bloqueos cada vez más largos por cuenta. Al quinto fallo seguido se envía una alerta.</dd>
+    </div>
+    <div>
+      <dt>El registro</dt>
+      <dd>Cada inicio de sesión, acceso denegado y cambio de permisos queda en una bitácora firmada. Si alguien la edita, se nota.</dd>
+    </div>
+    <div>
+      <dt>Recuperar el acceso</dt>
+      <dd>Enlaces de un solo uso que vencen en 30 minutos. En nuestra base solo queda su huella, así que una copia robada no sirve para nada.</dd>
+    </div>
+  </dl>
+</section>
+
+<section class="closing">
+  <%- include('partials/seal', { sealClass: 'seal-md' }) %>
+  <h2>Tu libreta, sellada.</h2>
+  <p>Crea una cuenta y escribe tu primera nota. Solo tú tienes la llave.</p>
+  <div class="hero-actions">
+    <a href="/register" class="btn btn-primary">Crear mi libreta</a>
+    <a href="/login" class="btn btn-quiet">Ya tengo cuenta</a>
+  </div>
+</section>
+
+<script src="/static/js/meter.js?v=<%= assetVersion %>" defer></script>
+<%- include('partials/footer') %>

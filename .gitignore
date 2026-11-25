@@ -5,3 +5,6 @@ node_modules/
 *.log
 coverage/
 .DS_Store
+
+# Secretos de producción preparados localmente (nunca al repositorio)
+render-secrets.local.txt

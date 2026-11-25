@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { requireAuth, requireRole } from '../middleware/auth.js';
 import { validate, roleChangeSchema, uuidSchema } from '../validation/schemas.js';
-import { listUsers, changeRole } from '../services/users.js';
+import { listUsers, changeRole, unlockUser } from '../services/users.js';
 import { listEvents } from '../services/audit.js';
 
 export const adminRouter = Router();
@@ -24,5 +24,15 @@ adminRouter.post('/users/:id/role', async (req, res) => {
   }
   const result = await changeRole({ adminId: req.user.id, targetId: req.params.id, role: data.role }, req.ip);
   req.session.flash = result.error ?? 'Rol actualizado.';
+  return res.redirect(303, '/admin');
+});
+
+adminRouter.post('/users/:id/unlock', async (req, res) => {
+  if (!uuidSchema.safeParse(req.params.id).success) {
+    req.session.flash = 'Solicitud inválida.';
+    return res.redirect(303, '/admin');
+  }
+  const result = await unlockUser({ adminId: req.user.id, targetId: req.params.id }, req.ip);
+  req.session.flash = result.error ?? 'Cuenta desbloqueada.';
   return res.redirect(303, '/admin');
 });

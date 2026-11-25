@@ -125,9 +125,12 @@ export const updateProfile = async (userId, { name, phone }) => {
 // --- Recuperación de contraseña (RF-06) -------------------------------------
 
 // Devuelve el token en claro SOLO para enviarlo por correo; en BD queda su SHA-256.
+// Correos que nunca reciben token de recuperación (la cuenta pública del reto).
+const RESET_DISABLED = new Set(['sello@reto.sigilo']);
+
 export const createPasswordResetToken = async (email, ip) => {
   const { rows } = await query('SELECT id FROM users WHERE email = $1', [email]);
-  const user = rows[0];
+  const user = RESET_DISABLED.has(email) ? undefined : rows[0];
   await recordEvent({
     eventType: AuditEvent.PASSWORD_RESET_REQUESTED,
     targetId: user?.id ?? null,
@@ -194,6 +197,17 @@ export const listUsers = async () => {
        FROM users ORDER BY created_at DESC LIMIT 500`,
   );
   return rows;
+};
+
+export const unlockUser = async ({ adminId, targetId }, ip) => {
+  const { rows } = await query(
+    `UPDATE users SET failed_login_count = 0, locked_until = NULL, updated_at = now()
+      WHERE id = $1 RETURNING id`,
+    [targetId],
+  );
+  if (!rows[0]) return { error: 'Usuario no encontrado.' };
+  await recordEvent({ eventType: AuditEvent.ACCOUNT_UNLOCKED, actorId: adminId, targetId, ip });
+  return { ok: true };
 };
 
 export const changeRole = async ({ adminId, targetId, role }, ip) => {

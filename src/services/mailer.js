@@ -14,12 +14,17 @@ export const sendPasswordResetEmail = async (to, resetUrl) => {
   const message = {
     from: config.MAIL_FROM,
     to,
-    subject: 'Recupera tu contraseña de SecureVault',
+    subject: 'Recupera tu contraseña de Sigilo',
     text: `Alguien solicitó restablecer tu contraseña.\n\nEnlace (válido 30 minutos, un solo uso):\n${resetUrl}\n\nSi no fuiste tú, ignora este correo.`,
   };
 
   if (transport) {
-    await transport.sendMail(message);
+    try {
+      await transport.sendMail(message);
+    } catch (err) {
+      // Falla el envío pero la respuesta al usuario no cambia (no revela si la cuenta existe).
+      logger.error({ err: { message: err.message, code: err.code } }, 'no se pudo enviar el correo de recuperación');
+    }
     return;
   }
   if (config.isProduction) {
