@@ -1,8 +1,16 @@
 // Movimiento de la portada. Sin JavaScript (o con "reducir movimiento") todo se ve completo y estático.
 (() => {
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (reduceMotion) return;
   const root = document.documentElement;
+
+  // 0. Fondo del hero: la nota cifrada real extendida como trama. Los caracteres que
+  //    parpadean son intentos de un ataque; el cifrado los rechaza y vuelve a su valor.
+  //    Cerca del cursor los intentos se intensifican.
+  const field = document.querySelector('.hero-field');
+  const source = [...document.querySelectorAll('.evidence code')].map((c) => c.textContent.trim()).join('');
+  if (field && source && field.getContext) startField(field, source, reduceMotion);
+
+  if (reduceMotion) return;
 
   // 1. Al cargar: el hash y la nota cifrada se "descifran" de izquierda a derecha,
   //    como un ataque que prueba caracteres hasta dar con el valor guardado.
@@ -103,3 +111,153 @@
   }, { passive: true });
   window.addEventListener('hashchange', catchUp);
 })();
+
+function startField(canvas, source, still) {
+  const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=$.';
+  const BG = '#2e3fd1';
+  const FONT_PX = 13;
+  const CELL_W = 11;
+  const CELL_H = 21;
+  const ctx = canvas.getContext('2d');
+  const base = document.createElement('canvas');
+  const baseCtx = base.getContext('2d');
+  let cols = 0;
+  let rows = 0;
+  let dpr = 1;
+  let active = new Map(); // índice de celda -> { char, until, born }
+  let pointer = null;
+  let running = false;
+  let visible = true;
+  let last = 0;
+
+  const charAt = (i) => source[i % source.length];
+  const font = () => `${FONT_PX}px ui-monospace, "Cascadia Mono", Consolas, monospace`;
+
+  const layout = () => {
+    const rect = canvas.getBoundingClientRect();
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    for (const c of [canvas, base]) {
+      c.width = Math.round(rect.width * dpr);
+      c.height = Math.round(rect.height * dpr);
+    }
+    cols = Math.ceil(rect.width / CELL_W) + 1;
+    rows = Math.ceil(rect.height / CELL_H) + 1;
+    baseCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    baseCtx.fillStyle = BG;
+    baseCtx.fillRect(0, 0, rect.width, rect.height);
+    baseCtx.font = font();
+    baseCtx.textBaseline = 'top';
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        // Cada fila arranca en otro punto del texto cifrado para que no se vean columnas repetidas.
+        const i = r * 37 + c;
+        baseCtx.fillStyle = `rgba(243, 245, 255, ${0.06 + ((i * 7919) % 5) * 0.012})`;
+        baseCtx.fillText(charAt(i), c * CELL_W, r * CELL_H + 3);
+      }
+    }
+    active = new Map();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.drawImage(base, 0, 0);
+  };
+
+  const spawn = (now, count, near) => {
+    for (let k = 0; k < count; k++) {
+      let c;
+      let r;
+      if (near && pointer) {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = Math.random() * 150;
+        c = Math.floor((pointer.x + Math.cos(angle) * dist) / CELL_W);
+        r = Math.floor((pointer.y + Math.sin(angle) * dist) / CELL_H);
+      } else {
+        c = (Math.random() * cols) | 0;
+        r = (Math.random() * rows) | 0;
+      }
+      if (c < 0 || r < 0 || c >= cols || r >= rows) continue;
+      const life = 140 + Math.random() * 520;
+      active.set(r * cols + c, { char: GLYPHS[(Math.random() * GLYPHS.length) | 0], born: now, until: now + life });
+    }
+  };
+
+  const draw = (now) => {
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.drawImage(base, 0, 0);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    if (pointer) {
+      const glow = ctx.createRadialGradient(pointer.x, pointer.y, 0, pointer.x, pointer.y, 220);
+      glow.addColorStop(0, 'rgba(160, 172, 255, 0.22)');
+      glow.addColorStop(1, 'rgba(160, 172, 255, 0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(pointer.x - 220, pointer.y - 220, 440, 440);
+    }
+
+    ctx.font = font();
+    ctx.textBaseline = 'top';
+    for (const [index, cell] of active) {
+      if (now >= cell.until) {
+        active.delete(index);
+        continue;
+      }
+      const c = index % cols;
+      const r = (index / cols) | 0;
+      const x = c * CELL_W;
+      const y = r * CELL_H;
+      const t = (now - cell.born) / (cell.until - cell.born);
+      ctx.fillStyle = BG;
+      ctx.fillRect(x, y, CELL_W, CELL_H);
+      ctx.fillStyle = `rgba(214, 220, 255, ${0.75 * (1 - t) + 0.08})`;
+      ctx.fillText(cell.char, x, y + 3);
+    }
+  };
+
+  const tick = (now) => {
+    if (!running) return;
+    if (now - last >= 33) {
+      // ~30 fotogramas por segundo bastan y gastan la mitad de batería.
+      const area = cols * rows;
+      spawn(now, Math.max(1, Math.round(area * 0.0016)), false);
+      if (pointer) spawn(now, 7, true);
+      draw(now);
+      last = now;
+    }
+    requestAnimationFrame(tick);
+  };
+
+  const play = () => {
+    if (still || running || !visible || document.hidden) return;
+    running = true;
+    requestAnimationFrame(tick);
+  };
+  const pause = () => {
+    running = false;
+  };
+
+  layout();
+  if (still) return;
+
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(layout, 150);
+  });
+
+  const band = canvas.parentElement;
+  band.addEventListener('pointermove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    pointer = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  });
+  band.addEventListener('pointerleave', () => {
+    pointer = null;
+  });
+
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      if (visible) play();
+      else pause();
+    }).observe(band);
+  }
+  document.addEventListener('visibilitychange', () => (document.hidden ? pause() : play()));
+  play();
+}

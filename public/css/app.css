@@ -510,3 +510,19 @@ td.cell-action form { display: inline-block; }
   .evidence { padding: 2.2rem 1.1rem 1.25rem; }
   .evidence code { font-size: 0.75rem; }
 }
+
+/* Fondo vivo del hero: la nota cifrada como trama (dibujada en <canvas> por home.js). */
+.band-hero { position: relative; isolation: isolate; }
+.hero-field {
+  position: absolute; inset: 0; width: 100%; height: 100%; z-index: -2; pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 100%);
+}
+/* Calma la zona del titular para que se lea sin esfuerzo. */
+.band-hero::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(90deg, rgba(46, 63, 209, 0.94) 0%, rgba(46, 63, 209, 0.78) 38%, rgba(46, 63, 209, 0.15) 70%, rgba(46, 63, 209, 0) 100%);
+}
+@media (max-width: 860px) {
+  .band-hero::before { background: linear-gradient(180deg, rgba(46, 63, 209, 0.72) 0%, rgba(46, 63, 209, 0.5) 50%, rgba(46, 63, 209, 0.12) 100%); }
+}
