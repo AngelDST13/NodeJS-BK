@@ -158,41 +158,45 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent); box-sh
 /* ---------- Pantallas de acceso ---------- */
 
 body.auth {
-  min-height: 100vh;
+  height: 100vh; height: 100dvh; min-height: 32rem;
   display: grid;
-  grid-template-columns: minmax(18rem, 5fr) 7fr;
+  grid-template-columns: minmax(17rem, 5fr) 7fr;
+  overflow: hidden;
 }
 
 .auth-brand {
   background: var(--brand);
   color: var(--on-brand);
-  padding: clamp(2rem, 6vw, 5rem) var(--gutter);
-  display: flex; flex-direction: column; justify-content: flex-end; gap: 1.25rem;
+  padding: clamp(1.5rem, 6vh, 4.5rem) var(--gutter);
+  display: flex; flex-direction: column; justify-content: flex-end; gap: clamp(0.5rem, 2vh, 1.25rem);
   position: relative; overflow: hidden; isolation: isolate;
 }
-.auth-mark { color: var(--on-brand); position: absolute; top: clamp(2rem, 8vh, 5rem); left: var(--gutter); }
+.auth-mark { color: var(--on-brand); position: absolute; top: clamp(1.25rem, 6vh, 4.5rem); left: var(--gutter); transition: translate 400ms ease-out; }
 .auth-brand .seal { color: var(--wax); }
 .auth-brand .seal .seal-cut { fill: var(--brand); }
 .auth-brand .seal .seal-ring { stroke: var(--brand); opacity: 0.5; }
-.auth-brand .guilloche { position: absolute; z-index: -1; width: clamp(26rem, 55vw, 44rem); right: -30%; top: -14%; color: var(--brass); opacity: 0.32; }
-.seal-lg { width: clamp(7rem, 14vw, 11rem); height: auto; aspect-ratio: 1; }
+.auth-brand .guilloche { position: absolute; z-index: -1; width: clamp(26rem, 55vw, 44rem); right: -30%; top: -14%; color: var(--brass); opacity: 0.32; transition: translate 600ms ease-out; }
+.seal-lg { width: clamp(4.5rem, min(14vw, 18vh), 10rem); height: auto; aspect-ratio: 1; rotate: var(--dial, 0deg); transition: rotate 260ms cubic-bezier(0.3, 1.6, 0.5, 1); }
 
 .auth-name {
   font-family: var(--font-display);
-  font-size: clamp(4rem, 11vw, 9rem);
+  font-size: clamp(3.25rem, min(11vw, 17vh), 8.5rem);
   line-height: 0.85;
   letter-spacing: -0.03em;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
 }
-.auth-line { max-width: 26ch; font-size: var(--step-1); line-height: 1.4; opacity: 0.92; }
+.auth-line { max-width: 26ch; font-size: clamp(1rem, 2.4vh, 1.25rem); line-height: 1.4; opacity: 0.9; }
 
-.auth-main { display: grid; place-items: center; padding: clamp(2rem, 6vw, 5rem) var(--gutter); }
+.auth-main { display: grid; place-items: center; padding: clamp(1.25rem, 5vh, 4rem) var(--gutter); overflow-y: auto; }
 .auth-form { width: 100%; max-width: 24rem; }
-.auth-form h1 { font-size: var(--step-3); margin-bottom: 1.75rem; }
-.auth-form .lede { color: var(--muted); margin: -0.75rem 0 1.5rem; }
-.switch { margin-top: 1.75rem; color: var(--muted); font-size: 0.9375rem; }
+.auth-form h1 { font-size: clamp(1.9rem, 5.2vh, 2.5rem); margin-bottom: clamp(1rem, 3.2vh, 1.75rem); }
+.auth-form .lede { color: var(--muted); margin: calc(-1 * clamp(0.4rem, 1.5vh, 0.75rem)) 0 clamp(0.9rem, 2.5vh, 1.5rem); }
+.auth-form .stack { gap: clamp(0.7rem, 2.2vh, 1.25rem); }
+.auth-form input[type='text'], .auth-form input[type='email'], .auth-form input[type='password'] { padding-block: clamp(0.5rem, 1.4vh, 0.7rem); }
+.auth-form .msg { margin-bottom: clamp(0.75rem, 2vh, 1.25rem); }
+.switch { margin-top: clamp(0.9rem, 3vh, 1.75rem); color: var(--muted); font-size: 0.9375rem; }
 
-/* El único movimiento automático: el sello se estampa al cargar. */
+/* Al cargar el sello se estampa; al enviar el formulario se presiona otra vez. */
 @media (prefers-reduced-motion: no-preference) {
   .seal-lg { animation: stamp 700ms cubic-bezier(0.2, 0.9, 0.25, 1.15) both 120ms; transform-origin: 50% 60%; }
   @keyframes stamp {
@@ -200,16 +204,59 @@ body.auth {
     70% { opacity: 1; }
     100% { opacity: 1; transform: scale(1) rotate(0deg); }
   }
+  .seal-lg.is-sealing { animation: press 650ms cubic-bezier(0.3, 0.9, 0.3, 1.3) both; }
+  @keyframes press { 0% { scale: 1; } 35% { scale: 0.82; } 70% { scale: 1.08; } 100% { scale: 1; } }
+  .auth-form.is-error { animation: shake 480ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both 200ms; }
+}
+
+@media (max-height: 640px) {
+  .auth-line { display: none; }
 }
 
 @media (max-width: 760px) {
-  body.auth { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
-  .auth-brand { flex-direction: row; align-items: center; justify-content: flex-start; gap: 1rem; padding-block: 1.5rem; }
+  body.auth { height: auto; min-height: 100dvh; overflow: visible; grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+  .auth-brand { flex-direction: row; align-items: center; justify-content: flex-start; gap: 1rem; padding-block: 1.1rem; }
   .auth-mark { position: static; }
-  .seal-lg { width: 3.5rem; }
-  .auth-name { font-size: 2.75rem; }
+  .seal-lg { width: 3.25rem; }
+  .auth-name { font-size: 2.5rem; margin: 0; }
   .auth-line { display: none; }
-  .auth-main { place-items: start center; }
+  .auth-main { place-items: start center; overflow: visible; }
+}
+
+/* ---------- Ayudas interactivas de los formularios (auth.js) ---------- */
+
+.pw-wrap { position: relative; }
+.pw-wrap input { padding-right: 5.5rem; }
+.pw-toggle {
+  position: absolute; right: 0.4rem; top: 50%; translate: 0 -50%;
+  border: 0; background: transparent; color: var(--muted); font: inherit; font-size: var(--step--1); font-weight: 600;
+  padding: 0.35rem 0.65rem; border-radius: 999px; cursor: pointer;
+}
+.pw-toggle:hover { color: var(--ink); background: var(--accent-wash); }
+.caps-warning { font-size: var(--step--1); color: var(--warn); background: var(--warn-wash); border-radius: 8px; padding: 0.3rem 0.6rem; justify-self: start; }
+
+.strength { display: grid; gap: 0.4rem; }
+.strength-bar { height: 0.4rem; border-radius: 999px; background: var(--line); overflow: hidden; }
+.strength-bar > span { display: block; height: 100%; width: 0; border-radius: inherit; background: var(--danger); transition: width 280ms ease, background-color 280ms ease; }
+.strength[data-level='1'] .strength-bar > span { width: 25%; background: var(--danger); }
+.strength[data-level='2'] .strength-bar > span { width: 50%; background: var(--warn); }
+.strength[data-level='3'] .strength-bar > span { width: 75%; background: var(--brass); }
+.strength[data-level='4'] .strength-bar > span { width: 100%; background: var(--ok); }
+.strength-label { font-size: var(--step--1); color: var(--muted); }
+.checks { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.2rem 0.85rem; font-size: var(--step--1); color: var(--muted); }
+.checks li { transition: color 200ms ease; }
+.checks li::before { content: '○ '; }
+.checks li.ok { color: var(--ok); }
+.checks li.ok::before { content: '✓ '; }
+.match { font-size: var(--step--1); }
+.match.ok { color: var(--ok); }
+.match.bad { color: var(--danger); }
+
+.btn[aria-busy='true'] { opacity: 0.85; cursor: progress; }
+.btn[aria-busy='true']::before {
+  content: ''; width: 0.9rem; height: 0.9rem; border-radius: 50%;
+  border: 2px solid currentColor; border-right-color: transparent;
+  animation: spin 700ms linear infinite;
 }
 
 /* ---------- Aplicación ---------- */
@@ -334,12 +381,8 @@ tr.tampered td { background: var(--danger-wash); }
 }
 
 /* Cuentas de prueba (solo desarrollo) */
-.demo { margin-top: 2.5rem; padding: 1.1rem 1.25rem; border: 1.5px dashed var(--line); border-radius: 14px; }
-.demo h2 { font-family: var(--font-ui); font-size: var(--step-0); font-weight: 600; margin-bottom: 0.25rem; }
-.demo dl { margin: 0.9rem 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-.demo dt { font-size: var(--step--1); color: var(--muted); margin-bottom: 0.2rem; }
-.demo dd { margin: 0; font-size: 0.9375rem; overflow-wrap: anywhere; user-select: all; }
-@media (max-width: 420px) { .demo dl { grid-template-columns: 1fr; } }
+.demo { margin-top: clamp(0.9rem, 3vh, 1.75rem); padding-top: clamp(0.75rem, 2vh, 1rem); border-top: 1.5px dashed var(--line); display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.6rem; }
+.demo-label { font-size: var(--step--1); color: var(--muted); flex-basis: 100%; }
 
 td.cell-action form { display: inline-block; }
 

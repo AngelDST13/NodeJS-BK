@@ -1,7 +1,7 @@
 <%- include('partials/auth-top') %>
 <h1>Entra a tu libreta</h1>
 <%- include('partials/messages') %>
-<form method="post" action="/login" class="stack" novalidate>
+<form method="post" action="/login" class="stack" data-auth-form novalidate>
   <input type="hidden" name="_csrf" value="<%= csrfToken %>">
   <div class="field">
     <label for="email">Correo</label>
@@ -18,18 +18,13 @@
 </form>
 <p class="switch">¿Primera vez aquí? <a href="/register">Crea una cuenta</a></p>
 <% if (demoAccounts.length) { %>
-  <section class="demo" aria-labelledby="demo-title">
-    <h2 id="demo-title">Cuentas de prueba</h2>
-    <p class="hint">Solo aparecen en desarrollo local. Se crean con <code>npm run seed</code>.</p>
-    <dl>
-      <% demoAccounts.forEach((a) => { %>
-        <div>
-          <dt><%= a.role === 'admin' ? 'Administrador' : 'Usuario' %></dt>
-          <dd><%= a.email %></dd>
-          <dd><%= a.password %></dd>
-        </div>
-      <% }) %>
-    </dl>
-  </section>
+  <div class="demo">
+    <p class="demo-label">Cuentas de prueba (solo en desarrollo local):</p>
+    <% demoAccounts.forEach((a) => { %>
+      <button type="button" class="btn btn-quiet btn-sm" data-fill-email="<%= a.email %>" data-fill-password="<%= a.password %>" title="<%= a.email %> / <%= a.password %>">
+        <%= a.role === 'admin' ? 'Usar administrador' : 'Usar usuario' %>
+      </button>
+    <% }) %>
+  </div>
 <% } %>
 <%- include('partials/auth-bottom') %>

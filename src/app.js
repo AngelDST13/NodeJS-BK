@@ -37,7 +37,7 @@ export const CDN_STYLESHEETS = Object.freeze([
 
 // Versión de la hoja de estilos según su contenido: cada cambio genera una URL nueva,
 // así el navegador nunca mezcla HTML nuevo con un CSS viejo guardado en caché.
-const versionedAssets = ['css/app.css', 'js/meter.js', 'js/home.js'].map((f) => path.join(rootDir, '..', 'public', f));
+const versionedAssets = ['css/app.css', 'js/meter.js', 'js/home.js', 'js/auth.js'].map((f) => path.join(rootDir, '..', 'public', f));
 const hashAssets = () => {
   const hash = createHash('sha256');
   for (const file of versionedAssets) hash.update(readFileSync(file));
