@@ -17,4 +17,19 @@
   <button type="submit" class="btn btn-primary btn-block">Entrar</button>
 </form>
 <p class="switch">¿Primera vez aquí? <a href="/register">Crea una cuenta</a></p>
+<% if (demoAccounts.length) { %>
+  <section class="demo" aria-labelledby="demo-title">
+    <h2 id="demo-title">Cuentas de prueba</h2>
+    <p class="hint">Solo aparecen en desarrollo local. Se crean con <code>npm run seed</code>.</p>
+    <dl>
+      <% demoAccounts.forEach((a) => { %>
+        <div>
+          <dt><%= a.role === 'admin' ? 'Administrador' : 'Usuario' %></dt>
+          <dd><%= a.email %></dd>
+          <dd><%= a.password %></dd>
+        </div>
+      <% }) %>
+    </dl>
+  </section>
+<% } %>
 <%- include('partials/auth-bottom') %>

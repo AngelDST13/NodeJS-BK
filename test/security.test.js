@@ -111,3 +111,9 @@ test('A10: rutas inexistentes y cuerpos gigantes no filtran detalles', async () 
   assert.equal(huge.status, 413);
   assert.ok(!huge.text.includes('PayloadTooLargeError'));
 });
+
+test('Las credenciales de prueba no aparecen fuera de desarrollo', async () => {
+  const html = (await newAgent().get('/login')).text;
+  assert.ok(!html.includes('sigilo.test'));
+  assert.ok(!html.includes('Cuentas de prueba'));
+});

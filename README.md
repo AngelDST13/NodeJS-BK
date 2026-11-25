@@ -39,7 +39,9 @@ npm run db:up               # PostgreSQL 17 en 127.0.0.1:5432 (crea también sec
 npm run dev                 # aplica migraciones y arranca en http://localhost:3000
 ```
 
-Para tener un administrador: regístrate en `/register` y luego `npm run create-admin -- tu@correo.com`.
+**Cuentas de prueba (solo desarrollo):** `npm run seed` crea un usuario con notas de ejemplo y un administrador; sus credenciales aparecen en la pantalla de login mientras `NODE_ENV=development`. El script se niega a correr en producción y el login no las muestra fuera de desarrollo.
+
+Para promover otra cuenta a administrador: regístrala en `/register` y luego `npm run create-admin -- tu@correo.com`.
 
 Sin `SMTP_URL`, el enlace de recuperación de contraseña se imprime en la consola local (solo en desarrollo).
 
@@ -51,7 +53,7 @@ Sin `SMTP_URL`, el enlace de recuperación de contraseña se imprime en la conso
 npm test
 ```
 
-42 pruebas cubren los requisitos funcionales y las evidencias OWASP (IDOR, XSS, inyección SQL, fuerza bruta → 429, CSRF, cabeceras, cifrado en BD, rotación de llaves, etc.).
+43 pruebas cubren los requisitos funcionales y las evidencias OWASP (IDOR, XSS, inyección SQL, fuerza bruta → 429, CSRF, cabeceras, cifrado en BD, rotación de llaves, etc.).
 
 ## Variables de entorno
 

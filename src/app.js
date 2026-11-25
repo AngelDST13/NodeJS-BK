@@ -17,6 +17,7 @@ import { authRouter } from './routes/auth.js';
 import { notesRouter } from './routes/notes.js';
 import { profileRouter } from './routes/profile.js';
 import { adminRouter } from './routes/admin.js';
+import { DEMO_ACCOUNTS } from './demo.js';
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
 
@@ -109,6 +110,8 @@ export const createApp = () => {
     res.locals.cdnStylesheets = CDN_STYLESHEETS;
     res.locals.formatDate = formatDate;
     res.locals.assetVersion = assetVersion();
+    // Credenciales de prueba visibles en el login SOLO en desarrollo local.
+    res.locals.demoAccounts = config.NODE_ENV === 'development' ? DEMO_ACCOUNTS : [];
     res.locals.title = 'Sigilo';
     res.locals.currentUser = null;
     next();
