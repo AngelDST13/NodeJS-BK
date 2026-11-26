@@ -101,7 +101,7 @@ Usuario ──HTTPS──▶ Render (TLS + balanceador, X-Forwarded-*)
                       │
                       ▼
               Contenedor Docker (node:26-alpine, usuario "node")
-              trust proxy=1 · helmet · rate limit · sesiones en PostgreSQL
+              trust proxy=1 + IP real desde CF-Connecting-IP · helmet · rate limit · sesiones
                       │ TLS verificado
                       ▼
               Neon PostgreSQL (usuario de la app con mínimo privilegio)

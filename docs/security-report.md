@@ -88,16 +88,17 @@ URL: https://securevault-s20f.onrender.com · fecha: 26/11/2026. Las capturas y 
 | Inyección SQL `' OR 1=1 --` | Rechazada | **403 del WAF de Cloudflare** que Render tiene delante (defensa en profundidad). La protección propia de la app (consultas parametrizadas → 401) está en `test/auth.test.js` | prueba manual + prueba automática |
 | CSRF sin token | 403 | **403** | prueba manual |
 | Errores | Mensaje genérico | `/debug` → 404 genérico, sin stack | prueba manual |
-| Fuerza bruta (6 intentos) | 429 en el 6.º | Con `TRUST_PROXY=1` **no** se alcanzaba el 429: Render tiene dos proxies delante y la app veía la IP de Cloudflare, distinta en cada petición. Corregido a `TRUST_PROXY=2` (ver abajo). El bloqueo progresivo por cuenta, que se guarda en la BD, sí funcionaba | prueba manual |
+| Fuerza bruta (6 intentos) | 429 en el 6.º | **401 ×5 y 429 en el 6.º** en `/login`; el reto también responde 429 aunque se cambie `X-Forwarded-For`. La app registra la IP pública real del cliente | prueba manual |
+| IP falsificada | Ignorada | `X-Forwarded-For` falso: ignorado. `CF-Connecting-IP` falso: **403 de Cloudflare** antes de llegar a la app | prueba manual |
 
-**Hallazgo corregido durante la verificación (A07):** el límite de intentos por IP depende de que `req.ip` sea la IP real del cliente. En Render la cadena es cliente → Cloudflare → balanceador de Render → app, así que hacen falta dos saltos de confianza. Se cambió `TRUST_PROXY` a `2` en `render.yaml` y se volvió a verificar en producción (sección siguiente).
+**Hallazgo corregido durante la verificación (A07):** la primera prueba de fuerza bruta en producción no llegó al 429. Render va detrás de Cloudflare y de su balanceador, así que con `TRUST_PROXY=1` la app veía la IP de un nodo de Cloudflare (distinta en cada petición) y el límite por IP nunca se alcanzaba; subirlo a 2 tampoco dio una IP estable. La solución fue leer la IP real de la cabecera `CF-Connecting-IP`, que Cloudflare agrega y sobrescribe siempre (`CLIENT_IP_HEADER=cf-connecting-ip`, `src/middleware/clientIp.js`), y dejar `TRUST_PROXY=1` solo para detectar HTTPS. Verificado después: IP real estable, contador que baja de uno en uno y 429 al sexto intento.
 
 ## 5. Riesgos residuales
 
 | Riesgo | Por qué queda | Mitigación futura |
 |---|---|---|
 | Rate limit en memoria | Se reinicia si el contenedor se reinicia o duerme (plan gratuito) y no se comparte entre réplicas. El bloqueo por cuenta sí persiste en la BD. | Almacén compartido (Redis / tabla en PostgreSQL). |
-| Número de proxies de Render | Si Render cambia su topología, `TRUST_PROXY=2` podría dejar de ser correcto y el límite por IP fallaría o aceptaría IP falsificadas. | Revisar el contador del reto tras cada cambio de plataforma; a futuro, verificar la IP con la cabecera propia del proveedor. |
+| IP del cliente vía Cloudflare | `CF-Connecting-IP` es confiable solo si todo el tráfico pasa por Cloudflare. Si alguien llegara al servidor de Render sin pasar por Cloudflare, podría enviar esa cabecera. | Verificar periódicamente con el reto (la IP mostrada debe ser la propia); en una infraestructura propia, aceptar solo conexiones desde los rangos de IP de la CDN. |
 | Llave de cifrado en variable de entorno | Quien tenga acceso al panel de Render o a la memoria del proceso la obtiene. | KMS (AWS KMS, GCP KMS) con cifrado por sobre (*envelope encryption*). |
 | Sin MFA | Una contraseña filtrada basta para entrar. | TOTP (RFC 6238) como segundo factor. |
 | Sin verificación de correo | Se puede registrar un correo ajeno (no da acceso a nada del dueño real). | Correo de verificación con token de un solo uso. |

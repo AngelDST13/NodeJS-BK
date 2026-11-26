@@ -74,7 +74,8 @@ Solo nombres; los valores van en `.env` (local, excluido de Git) o en el panel d
 | `NODE_ENV` | sí | `production` en el servidor |
 | `PORT` | no | Puerto HTTP (la plataforma lo inyecta) |
 | `APP_ORIGIN` | sí | URL pública, p. ej. `https://securevault.onrender.com`. Se usa para CSRF/Origin y enlaces de correo |
-| `TRUST_PROXY` | sí en prod | Número de proxies delante de la app (`2` en Render: Cloudflare + balanceador). Se verifica en producción con el contador del reto: debe bajar de uno en uno |
+| `TRUST_PROXY` | sí en prod | Número de proxies de confianza para detectar HTTPS (`1` en Render) |
+| `CLIENT_IP_HEADER` | sí en Render | `cf-connecting-ip`: la IP real del cliente que pone Cloudflare. Sin esto, el límite de intentos por IP no funciona en Render. Se verifica con el reto: debe mostrar tu IP y el contador bajar de uno en uno |
 | `DATABASE_URL` | sí | Cadena de conexión PostgreSQL |
 | `DATABASE_SSL` | sí en prod | `true` exige TLS con verificación de certificado |
 | `SESSION_SECRET` | sí | ≥ 32 caracteres aleatorios |
