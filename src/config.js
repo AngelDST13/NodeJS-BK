@@ -30,6 +30,8 @@ const schema = z.object({
   AUDIT_HMAC_KEY: base64Key(32),
   APP_ORIGIN: z.string().refine(isUrl, 'APP_ORIGIN debe ser una URL').default('http://localhost:3000'),
   TRUST_PROXY: z.coerce.number().int().min(0).default(0),
+  // Cabecera con la IP real del cliente puesta por la CDN (solo si la CDN la sobrescribe siempre).
+  CLIENT_IP_HEADER: z.enum(['cf-connecting-ip', 'true-client-ip', 'x-real-ip']).optional(),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
   SMTP_URL: z.string().optional(),
   MAIL_FROM: z.string().default('SecureVault <no-reply@securevault.local>'),

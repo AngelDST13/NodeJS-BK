@@ -84,6 +84,7 @@ homeRouter.post('/reto', challengeLimiter, async (req, res) => {
         remaining: req.rateLimit.remaining,
         failedInARow: evidence.failedInARow,
         lockedMinutes: evidence.lockedMinutes,
+        ip: req.ip,
       };
   return res.redirect(303, '/#reto');
 });

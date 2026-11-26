@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { config } from './config.js';
 import { pool } from './db/pool.js';
 import { loadUser } from './middleware/auth.js';
+import { clientIp } from './middleware/clientIp.js';
 import { csrfProtection } from './middleware/csrf.js';
 import { globalLimiter } from './middleware/rateLimit.js';
 import { notFound, errorHandler } from './middleware/errors.js';
@@ -62,6 +63,7 @@ export const createApp = () => {
   // Detrás de un proxy (Render, Railway, Nginx) hace que req.ip y req.secure sean correctos,
   // necesario para cookies Secure y para que el rate limit cuente por IP real.
   app.set('trust proxy', config.TRUST_PROXY);
+  app.use(clientIp(config.CLIENT_IP_HEADER));
   app.set('view engine', 'ejs');
   app.set('views', path.join(rootDir, 'views'));
 

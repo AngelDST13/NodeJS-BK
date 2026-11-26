@@ -90,7 +90,7 @@
         <li>Argon2id tardó <strong><%= result.ms %> ms</strong> en comprobarla. Es lento a propósito.</li>
         <li>Te quedan <strong><%= result.remaining %></strong> de <%= challengeLimit %> intentos en esta ventana.</li>
         <li>La cuenta lleva <strong><%= result.failedInARow %></strong> fallos seguidos<% if (result.lockedMinutes > 0) { %> y está bloqueada <strong><%= result.lockedMinutes %> min</strong>, aunque acertaras<% } %>.</li>
-        <li>El intento quedó en la bitácora, firmado con HMAC para que nadie lo borre sin que se note.</li>
+        <li>El intento quedó en la bitácora<% if (result.ip) { %> con tu IP <strong><%= result.ip %></strong><% } %>, firmado con HMAC para que nadie lo borre sin que se note.</li>
       </ul>
     <% } %>
     <p class="aside-note">En el inicio de sesión real, Sigilo no da estos detalles: responde siempre lo mismo para no ayudar a quien ataca. Aquí los mostramos para que veas qué pasa por dentro.</p>

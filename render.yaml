@@ -13,10 +13,12 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      # Render tiene dos saltos de proxy delante de la app (Cloudflare + balanceador de Render).
-      # Con 1, req.ip sería la IP de Cloudflare (cambia por petición) y el límite por IP no funcionaría.
+      # Render va detrás de Cloudflare: la IP real del cliente llega en cf-connecting-ip
+      # (Cloudflare la sobrescribe siempre). TRUST_PROXY=1 sirve para detectar HTTPS (X-Forwarded-Proto).
       - key: TRUST_PROXY
-        value: "2"
+        value: "1"
+      - key: CLIENT_IP_HEADER
+        value: cf-connecting-ip
       - key: DATABASE_SSL
         value: "true"
       - key: DATA_ENCRYPTION_KEY_VERSION

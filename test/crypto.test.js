@@ -6,6 +6,7 @@ import { generateToken, sha256 } from '../src/crypto/tokens.js';
 import { isAllowedOutboundUrl } from '../src/services/alerts.js';
 import { maskPhone } from '../src/services/users.js';
 import { pool } from '../src/db/pool.js';
+import { clientIp } from '../src/middleware/clientIp.js';
 
 test.after(() => pool.end());
 
@@ -65,4 +66,22 @@ test('SSRF: solo HTTPS a hosts en lista blanca', () => {
 
 test('Enmascarado del teléfono', () => {
   assert.equal(maskPhone('+57 300 555 1234'), '***-***-1234');
+});
+
+test('IP del cliente: usa la cabecera de la CDN si es una IP válida; si no, req.ip', () => {
+  const make = (headers) => {
+    const req = { headers, get: (h) => headers[h.toLowerCase()] };
+    Object.defineProperty(req, 'ip', { value: '10.0.0.1', configurable: true });
+    return req;
+  };
+  const mw = clientIp('cf-connecting-ip');
+  const a = make({ 'cf-connecting-ip': '190.85.12.34' });
+  mw(a, {}, () => {});
+  assert.equal(a.ip, '190.85.12.34');
+  const b = make({ 'cf-connecting-ip': 'no-es-ip; DROP TABLE' });
+  mw(b, {}, () => {});
+  assert.equal(b.ip, '10.0.0.1');
+  const c = make({ 'cf-connecting-ip': '190.85.12.34' });
+  clientIp(undefined)(c, {}, () => {});
+  assert.equal(c.ip, '10.0.0.1', 'sin configurar no se confía en la cabecera');
 });
