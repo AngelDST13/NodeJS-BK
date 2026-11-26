@@ -24,6 +24,7 @@ test('A02: cabeceras de seguridad y sin X-Powered-By', async () => {
   assert.match(csp, /default-src 'self'/);
   assert.match(csp, /script-src 'self'(;|$)/);
   assert.match(csp, /frame-ancestors 'none'/);
+  assert.equal(res.headers['x-frame-options'], 'DENY');
   assert.match(csp, /object-src 'none'/);
   assert.equal(res.headers['x-content-type-options'], 'nosniff');
   assert.equal(res.headers['referrer-policy'], 'same-origin');

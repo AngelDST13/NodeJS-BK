@@ -99,6 +99,8 @@ export const createApp = () => {
       referrerPolicy: { policy: 'same-origin' },
       // require-corp: solo se cargan recursos de otro origen que lo autoricen por CORS (las tipografías del CDN lo hacen).
       crossOriginEmbedderPolicy: { policy: 'require-corp' },
+      // Igual que frame-ancestors 'none' de la CSP, para navegadores antiguos (A02 clickjacking).
+      xFrameOptions: { action: 'deny' },
     }),
   );
   app.use((req, res, next) => {

@@ -2,9 +2,22 @@ import pg from 'pg';
 import { config } from '../config.js';
 import { logger } from '../logger.js';
 
+// sslmode de la URL (p. ej. ?sslmode=require de Neon) reemplazaría la opción ssl de abajo y
+// pg avisa que su significado cambiará. Se quita y la verificación TLS queda explícita:
+// rejectUnauthorized=true equivale a verify-full (certificado válido + nombre del host).
+const withoutSslMode = (url) => {
+  try {
+    const parsed = new URL(url);
+    parsed.searchParams.delete('sslmode');
+    return parsed.toString();
+  } catch {
+    return url;
+  }
+};
+
 // Timeouts en todas las operaciones de BD (A10): una BD lenta no debe colgar la app.
 export const pool = new pg.Pool({
-  connectionString: config.DATABASE_URL,
+  connectionString: withoutSslMode(config.DATABASE_URL),
   ssl: config.DATABASE_SSL === 'true' ? { rejectUnauthorized: true } : false,
   max: 10,
   connectionTimeoutMillis: 5_000,
