@@ -74,7 +74,7 @@ Solo nombres; los valores van en `.env` (local, excluido de Git) o en el panel d
 | `NODE_ENV` | sí | `production` en el servidor |
 | `PORT` | no | Puerto HTTP (la plataforma lo inyecta) |
 | `APP_ORIGIN` | sí | URL pública, p. ej. `https://securevault.onrender.com`. Se usa para CSRF/Origin y enlaces de correo |
-| `TRUST_PROXY` | sí en prod | Número de proxies delante de la app (`1` en Render) |
+| `TRUST_PROXY` | sí en prod | Número de proxies delante de la app (`2` en Render: Cloudflare + balanceador). Se verifica en producción con el contador del reto: debe bajar de uno en uno |
 | `DATABASE_URL` | sí | Cadena de conexión PostgreSQL |
 | `DATABASE_SSL` | sí en prod | `true` exige TLS con verificación de certificado |
 | `SESSION_SECRET` | sí | ≥ 32 caracteres aleatorios |

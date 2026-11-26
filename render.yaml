@@ -13,8 +13,10 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      # Render tiene dos saltos de proxy delante de la app (Cloudflare + balanceador de Render).
+      # Con 1, req.ip sería la IP de Cloudflare (cambia por petición) y el límite por IP no funcionaría.
       - key: TRUST_PROXY
-        value: "1"
+        value: "2"
       - key: DATABASE_SSL
         value: "true"
       - key: DATA_ENCRYPTION_KEY_VERSION

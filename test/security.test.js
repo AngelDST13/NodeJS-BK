@@ -28,6 +28,8 @@ test('A02: cabeceras de seguridad y sin X-Powered-By', async () => {
   assert.equal(res.headers['x-content-type-options'], 'nosniff');
   assert.equal(res.headers['referrer-policy'], 'same-origin');
   assert.equal(res.headers['access-control-allow-origin'], undefined, 'sin CORS abierto');
+  assert.equal(res.headers['cross-origin-embedder-policy'], 'require-corp');
+  assert.equal(res.headers['cross-origin-opener-policy'], 'same-origin');
 });
 
 test('A08: la hoja de estilos del CDN usa Subresource Integrity', async () => {

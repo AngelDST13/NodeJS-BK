@@ -95,7 +95,8 @@ export const createApp = () => {
       // same-origin: nunca envía la URL (p. ej. con el token de recuperación) a otros sitios,
       // pero mantiene la cabecera Origin real en los POST propios (no-referrer la vuelve "null").
       referrerPolicy: { policy: 'same-origin' },
-      crossOriginEmbedderPolicy: false, // las tipografías del CDN se cargan con SRI + CORS
+      // require-corp: solo se cargan recursos de otro origen que lo autoricen por CORS (las tipografías del CDN lo hacen).
+      crossOriginEmbedderPolicy: { policy: 'require-corp' },
     }),
   );
   app.use((req, res, next) => {
