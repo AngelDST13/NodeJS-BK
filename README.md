@@ -4,11 +4,14 @@
 
 Es una aplicación web para guardar notas privadas y un dato sensible de perfil (teléfono), construida con Node.js aplicando el **OWASP Top 10:2025**, hash de contraseñas con **Argon2id**, cifrado autenticado **AES-256-GCM** y despliegue en producción con HTTPS.
 
-| Documento | Contenido |
-|---|---|
-| [docs/deep-research.md](docs/deep-research.md) | Fase 0: investigación sobre despliegue de Node.js en producción |
-| [docs/threat-model.md](docs/threat-model.md) | Fase 1: modelo de datos, flujo de autenticación y modelo de amenazas STRIDE (A06) |
-| [docs/security-report.md](docs/security-report.md) | Fase 4: mapa OWASP Top 10:2025 → mitigación → evidencia, decisiones criptográficas y riesgos residuales |
+| Documento | Contenido | PDF |
+|---|---|---|
+| [docs/deep-research.md](docs/deep-research.md) | Fase 0: investigación sobre despliegue de Node.js en producción | [PDF](docs/deep-research.pdf) |
+| [docs/threat-model.md](docs/threat-model.md) | Fase 1: modelo de datos, flujo de autenticación y modelo de amenazas STRIDE (A06) | [PDF](docs/threat-model.pdf) |
+| [docs/security-report.md](docs/security-report.md) | Fase 4: mapa OWASP Top 10:2025 → mitigación → evidencia, verificación en producción y riesgos residuales | [PDF](docs/security-report.pdf) |
+| [docs/evidencias/](docs/evidencias/) | Capturas de securityheaders.com (A+), Mozilla Observatory (A+), SSL Labs (A+), informe OWASP ZAP y panel de bitácora | — |
+
+**Producción:** https://securevault-s20f.onrender.com
 
 ## Funcionalidad
 
@@ -63,7 +66,7 @@ Sin `SMTP_URL`, el enlace de recuperación de contraseña se imprime en la conso
 npm test
 ```
 
-55 pruebas cubren los requisitos funcionales y las evidencias OWASP (IDOR, XSS, inyección SQL, fuerza bruta → 429, CSRF, cabeceras, modo producción (HTTPS, HSTS, configuración insegura rechazada), cifrado en BD, rotación de llaves, etc.).
+56 pruebas cubren los requisitos funcionales y las evidencias OWASP (IDOR, XSS, inyección SQL, fuerza bruta → 429, CSRF, cabeceras, modo producción (HTTPS, HSTS, configuración insegura rechazada), cifrado en BD, rotación de llaves, etc.).
 
 ## Variables de entorno
 

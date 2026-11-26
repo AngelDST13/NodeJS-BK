@@ -48,7 +48,7 @@ found 0 vulnerabilities
 
 ### Pruebas automáticas
 
-`npm test` → 55 pruebas, 55 correctas (node:test + supertest contra PostgreSQL 17), en Node 24 local y Node 26 (imagen `node:26-alpine` y CI).
+`npm test` → 56 pruebas, 56 correctas (node:test + supertest contra PostgreSQL 17), en Node 24 local y Node 26 (imagen `node:26-alpine` y CI).
 
 ## 3. Decisiones criptográficas
 
